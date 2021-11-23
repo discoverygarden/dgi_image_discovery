@@ -1,0 +1,45 @@
+<?php
+
+use Drupal\dgi_image_discovery\DIDImageItemList;
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function dgi_image_discovery_entity_base_field_info(EntityTypeInterface $entity_type) {
+
+  if ($entity_type->id() === 'node') {
+    $fields = [];
+
+    $fields['did_image'] = BaseFieldDefinition::create('did_image')
+      ->setName('did_image')
+      ->setLabel(t('DGI Image Discovery Discovered Image'))
+      ->setDescription(t('Image to represent the given node.'))
+      ->setComputed(TRUE)
+      ->setClass(DIDImageItemList::class)
+      ->setDisplayConfigurable('view', TRUE);
+
+    return $fields;
+  }
+}
+
+function dgi_image_discovery_field_formatter_info_alter(array &$info) {
+  $info['image']['field_types'][] = 'did_image';
+}
+
+function dgi_image_discovery_field_widget_info_alter(array &$info) {
+  $info['image_image']['field_types'][] = 'did_image';
+}
+
+function dgi_image_discovery_views_data_alter(array &$data) {
+  if (isset($data['node'])) {
+    $data['node']['did_image'] = [
+      'title' => t('DGI Image Discovery Discovered Image'),
+      'field' => [
+        'id' => 'dgi_image_discovery_did_image',
+      ],
+    ];
+  }
+}

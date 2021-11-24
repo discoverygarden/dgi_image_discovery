@@ -4,7 +4,8 @@ namespace Drupal\dgi_image_discovery\Plugin\views\field;
 
 use Drupal\node\NodeInterface;
 use Drupal\views\ResultRow;
-use Drupal\views\Plugin\views\field\FieldPluginBase;
+#use Drupal\views\Plugin\views\field\FieldPluginBase;
+use Drupal\views\Plugin\views\field\EntityField;
 
 /**
  * A handler to provide proper displays for our discovered image.
@@ -13,7 +14,7 @@ use Drupal\views\Plugin\views\field\FieldPluginBase;
  *
  * @ViewsField("did_image")
  */
-class DGIImageDiscoveryDIDImage extends FieldPluginBase {
+class DGIImageDiscoveryDIDImage extends EntityField {
 
   /**
    * {@inheritdoc}
@@ -39,7 +40,7 @@ class DGIImageDiscoveryDIDImage extends FieldPluginBase {
   /**
    * {@inheritdoc}
    */
-  public function query() {
+  public function query($use_groupby = FALSE) {
     // This function exists to override parent query function.
     // Do nothing.
   }

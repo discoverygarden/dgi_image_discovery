@@ -1,6 +1,7 @@
 <?php
 
 use Drupal\dgi_image_discovery\DIDImageItemList;
+use Drupal\dgi_image_discovery\Plugin\Field\FieldType\DIDImageItem;
 
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -19,26 +20,38 @@ function dgi_image_discovery_entity_base_field_info(EntityTypeInterface $entity_
       ->setDescription(t('Image to represent the given node.'))
       ->setComputed(TRUE)
       ->setClass(DIDImageItemList::class)
-      ->setDisplayConfigurable('view', TRUE);
+      #->setClass(DIDImageItem::class)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setSetting('target_type', 'media');
 
     return $fields;
   }
 }
 
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
 function dgi_image_discovery_field_formatter_info_alter(array &$info) {
-  $info['image']['field_types'][] = 'did_image';
+  $info['media_thumbnail']['field_types'][] = 'did_image';
 }
 
-function dgi_image_discovery_field_widget_info_alter(array &$info) {
-  $info['image_image']['field_types'][] = 'did_image';
-}
+/**
+ * Implements hook_field_widget_info_alter().
+ */
+#function dgi_image_discovery_field_widget_info_alter(array &$info) {
+#  $info['image_image']['field_types'][] = 'did_image';
+#}
 
+/**
+ * Implements hook_views_data_alter().
+ */
 function dgi_image_discovery_views_data_alter(array &$data) {
-  if (isset($data['node'])) {
-    $data['node']['did_image'] = [
+  $table = 'node';
+  if (isset($data[$table])) {
+    $data[$table]['did_image'] = [
       'title' => t('DGI Image Discovery Discovered Image'),
       'field' => [
-        'id' => 'dgi_image_discovery_did_image',
+        'id' => 'did_image',
       ],
     ];
   }

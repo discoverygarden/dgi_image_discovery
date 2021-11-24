@@ -2,42 +2,24 @@
 
 namespace Drupal\dgi_image_discovery\Plugin\Field\FieldType;
 
+use Drupal\media\MediaInterface;
 use Drupal\node\NodeInterface;
 use Drupal\image\Plugin\Field\FieldType\ImageItem;
-
-/*
- *   column_groups = {
- *     "file" = {
- *       "label" = @Translation("File"),
- *       "columns" = {
- *         "target_id", "width", "height"
- *       },
- *       "require_all_groups_for_translation" = TRUE
- *     },
- *     "alt" = {
- *       "label" = @Translation("Alt"),
- *       "translatable" = TRUE
- *     },
- *     "title" = {
- *       "label" = @Translation("Title"),
- *       "translatable" = TRUE
- *     },
- *   },
- */
+use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 
 /**
- * Variant of the 'image' field that does a lookup from the given node.
+ * Find image media related to the given node.
  *
  * @FieldType(
  *   id = "did_image",
  *   label = @Translation("DGI Image Discovery"),
  *   description = @Translation("An image relevant to the given node."),
- *   default_widget = "image_image",
- *   default_formatter = "image",
- *   constraints = {"ReferenceAccess" = {}, "FileValidation" = {}}
+ *   default_formatter = "media_thumbnail",
+ *   constraints = {"ReferenceAccess" = {}},
+ *   list_class = "\Drupal\dgi_image_discovery\DIDImageItemList",
  * )
  */
-class DIDImageItem extends ImageItem {
+class DIDImageItem extends EntityReferenceItem {
 
   /**
    * Whether or not the value has been calculated.
@@ -84,18 +66,21 @@ class DIDImageItem extends ImageItem {
     }
   }
 
-  protected function getImage(NodeInterface $node, $depth = 0) {
+  protected function getImage(NodeInterface $node, $depth = 0) : ?MediaInterface {
     // Lookup representative image, return if found; otherwise,
     if ($value = $this->getRepresentative($node)) {
+      ddm('got representative');
       return $value;
     }
     // Lookup thumbnail from the current object, return if found; otherwise,
     if ($value = $this->getOwnedThumbnail($node)) {
+      ddm('got owned');
       return $value;
     }
     // Find first child object and call return the result of this method with
     // it; otherwise...
     if (($depth < 5) && ($value = $this->getFromFirstChild($node, $depth + 1))) {
+      ddm($depth, 'got child');
       return $node;
     }
 
@@ -104,28 +89,35 @@ class DIDImageItem extends ImageItem {
     return NULL;
   }
 
-  protected function getRepresentative(NodeInterface $node) {
-    $representative = $node->field_representative_image->field_media_image->getValue();
-    return $representative ?? NULL;
+  protected function getRepresentative(NodeInterface $node) : ?MediaInterface {
+    $representative = $node->field_representative_image->entity;
+    if ($representative && $representative->access('view')) {
+      return $representative;
+    }
+
+    return NULL;
   }
 
-  protected function getOwnedThumbnail(NodeInterface $node) {
+  protected function getOwnedThumbnail(NodeInterface $node) : ?MediaInterface {
     // XXX: DI not presently possible.
     // @see https://www.drupal.org/project/drupal/issues/2053415
     $entity_type_manager = \Drupal::service('entity_type.manager');
     $storage = $entity_type_manager->getStorage('media');
     $results = $storage->getQuery()
       ->condition('field_media_of', $node->id())
-      ->condition('field_media_use.entity:field_external_uri.uri', 'http://pcdm.org/use#ThumbnailImage')
+      ->condition('field_media_use.entity:taxonomy_term.field_external_uri.uri', 'http://pcdm.org/use#ThumbnailImage')
+      ->accessCheck()
       ->range(0, 1)
       ->execute();
 
     if ($results) {
-      return $storage->load(reset($results))->field_media_image->getValue();
+      return $storage->load(reset($results));
     }
+
+    return NULL;
   }
 
-  protected function getFromFirstChild(NodeInterface $node, $depth) {
+  protected function getFromFirstChild(NodeInterface $node, $depth) : ?MediaInterface {
     // XXX: DI not presently possible.
     // @see https://www.drupal.org/project/drupal/issues/2053415
     $entity_type_manager = \Drupal::service('entity_type.manager');
@@ -134,12 +126,15 @@ class DIDImageItem extends ImageItem {
     $results = $storage->getQuery()
       ->condition('field_member_of', $node->id())
       ->sort('field_weight')
+      ->accessCheck()
       ->range(0, 1)
       ->execute();
 
     if ($results) {
-      return $this->getImage($this->storage->load(reset($results)), $depth);
+      return $this->getImage($storage->load(reset($results)), $depth);
     }
+
+    return NULL;
   }
 
 }

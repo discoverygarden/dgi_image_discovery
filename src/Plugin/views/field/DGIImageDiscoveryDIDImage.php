@@ -11,7 +11,7 @@ use Drupal\views\Plugin\views\field\FieldPluginBase;
  *
  * @ingroup views_field_handlers
  *
- * @ViewsField("dgi_image_discovery_did_image")
+ * @ViewsField("did_image")
  */
 class DGIImageDiscoveryDIDImage extends FieldPluginBase {
 

@@ -4,8 +4,9 @@ namespace Drupal\dgi_image_discovery;
 
 use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\TypedData\ComputedItemListTrait;
+use Drupal\Core\Field\EntityReferenceFieldItemList;
 
-class DIDImageItemList extends FieldItemList {
+class DIDImageItemList extends EntityReferenceFieldItemList {
 
   use ComputedItemListTrait;
 

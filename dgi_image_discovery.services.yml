@@ -1,0 +1,6 @@
+---
+services:
+  dgi_image_discovery.views_field_subscriber:
+    class: '\Drupal\dgi_image_discovery\EventSubscriber\ViewsFieldSubscriber'
+    tags:
+      - name: event_subscriber

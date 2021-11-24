@@ -69,21 +69,22 @@ class DIDImageItem extends EntityReferenceItem {
   protected function getImage(NodeInterface $node, $depth = 0) : ?MediaInterface {
     // Lookup representative image, return if found; otherwise,
     if ($value = $this->getRepresentative($node)) {
-      ddm('got representative');
+      ddm("got representative for {$node->id()}");
       return $value;
     }
     // Lookup thumbnail from the current object, return if found; otherwise,
     if ($value = $this->getOwnedThumbnail($node)) {
-      ddm('got owned');
+      ddm("got owned for {$node->id()}");
       return $value;
     }
     // Find first child object and call return the result of this method with
     // it; otherwise...
     if (($depth < 5) && ($value = $this->getFromFirstChild($node, $depth + 1))) {
-      ddm($depth, 'got child');
-      return $node;
+      ddm($depth, "got child for {$node->id()}");
+      return $value;
     }
 
+    ddm("found nothing for {$node->id()}");
     // ... we set nothing, and expect whatever is using this to deal with
     // getting nothing however they like.
     return NULL;

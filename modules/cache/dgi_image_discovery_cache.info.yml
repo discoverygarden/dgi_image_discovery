@@ -1,0 +1,7 @@
+name: DGI Image Discovery Cache
+description: Repository object augmentation.
+package: DGI Helpers
+type: module
+core_version_requirement: ^8 || ^9
+dependencies:
+  - dgi_image_discovery:dgi_image_discovery

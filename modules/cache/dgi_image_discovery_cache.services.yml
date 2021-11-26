@@ -1,0 +1,25 @@
+---
+services:
+  cache.did_image:
+    class: Drupal\Core\Cache\CacheBackendInterface
+    tags:
+      - { name: cache.bin }
+    factory: ['@cache_factory', 'get']
+    arguments: [did_image]
+  dgi_image_discovery_cache.service:
+    class: '\Drupal\dgi_image_discovery_cache\Service'
+    arguments:
+      - '@cache.did_image'
+      - '@cache_contexts_manager'
+  dgi_image_discovery_cache.discovery_subscriber:
+    class: '\Drupal\dgi_image_discovery_cache\EventSubscriber\DiscoverCacheSubscriber'
+    arguments:
+      - '@dgi_image_discovery_cache.service'
+    tags:
+      - name: event_subscriber
+  dgi_image_discovery_cache.discovered_subscriber:
+    class: '\Drupal\dgi_image_discovery_cache\EventSubscriber\DiscoveredCacheSubscriber'
+    arguments:
+      - '@dgi_image_discovery_cache.service'
+    tags:
+      - name: event_subscriber

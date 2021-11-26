@@ -1,7 +1,11 @@
 <?php
 
+/**
+ * @file
+ * General hook implementations.
+ */
+
 use Drupal\dgi_image_discovery\DIDImageItemList;
-use Drupal\dgi_image_discovery\Plugin\Field\FieldType\DIDImageItem;
 
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -20,7 +24,6 @@ function dgi_image_discovery_entity_base_field_info(EntityTypeInterface $entity_
       ->setDescription(t('Image to represent the given node.'))
       ->setComputed(TRUE)
       ->setClass(DIDImageItemList::class)
-      #->setClass(DIDImageItem::class)
       ->setDisplayConfigurable('view', TRUE)
       ->setSetting('target_type', 'media');
 
@@ -34,13 +37,6 @@ function dgi_image_discovery_entity_base_field_info(EntityTypeInterface $entity_
 function dgi_image_discovery_field_formatter_info_alter(array &$info) {
   $info['media_thumbnail']['field_types'][] = 'did_image';
 }
-
-/**
- * Implements hook_field_widget_info_alter().
- */
-#function dgi_image_discovery_field_widget_info_alter(array &$info) {
-#  $info['image_image']['field_types'][] = 'did_image';
-#}
 
 /**
  * Implements hook_views_data_alter().

@@ -7,6 +7,9 @@ use Drupal\search_api\Event\MappingViewsFieldHandlersEvent;
 
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
+/**
+ * Add in our field mapping.
+ */
 class ViewsFieldSubscriber implements EventSubscriberInterface {
 
   /**

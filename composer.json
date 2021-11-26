@@ -1,4 +1,10 @@
 {
     "name": "discoverygarden/dgi_image_discovery",
-    "type": "drupal-module"
+    "type": "drupal-module",
+    "require": {
+      "drupal/media": "^8 | ^9",
+      "drupal/node": "^8 | ^9",
+      "drupal/search_api": "^1.19",
+      "drupal/views": "^8 | ^9"
+    }
 }

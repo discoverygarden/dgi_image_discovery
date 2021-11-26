@@ -12,6 +12,8 @@ class ImageDiscoveredEvent extends Event {
   const EVENT_NAME = 'dgi_image_discovery.post_event';
 
   /**
+   * The image discovery event to which we are responding.
+   *
    * @var \Drupal\dgi_image_discovery\ImageDiscoveryEvent
    */
   protected ImageDiscoveryEvent $event;

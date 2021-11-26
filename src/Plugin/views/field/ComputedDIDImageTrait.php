@@ -4,12 +4,16 @@ namespace Drupal\dgi_image_discovery\Plugin\views\field;
 
 use Drupal\node\NodeInterface;
 use Drupal\views\ResultRow;
-use Drupal\views\Plugin\views\field\EntityField;
 
+/**
+ * Computed field trait for reuse between content and search_api views.
+ */
 trait ComputedDIDImageTrait {
 
   /**
-   * {@inheritdoc}
+   * Render our value.
+   *
+   * @see \Drupal\views\Plugin\views\field\FieldPluginBase::render()
    */
   public function render(ResultRow $values) {
     $relationship_entities = $values->_relationship_entities;
@@ -30,7 +34,9 @@ trait ComputedDIDImageTrait {
   }
 
   /**
-   * {@inheritdoc}
+   * Query nothing, as we will be computing something instead.
+   *
+   * @see \Drupal\views\Plugin\views\field\FieldPluginBase::query()
    */
   public function query($use_groupby = FALSE) {
     // This function exists to override parent query function.

@@ -1,4 +1,4 @@
-<?
+<?php
 
 namespace Drupal\dgi_image_discovery\EventSubscriber;
 
@@ -8,14 +8,23 @@ use Drupal\node\NodeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
-use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-
-class DiscoverOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriver {
+/**
+ * Discover thumbnails which are owned by a given object.
+ */
+class DiscoverOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriber {
 
   const PRIORITY = 900;
 
+  /**
+   * The media storage service of which to query/load media objects.
+   *
+   * @var \Drupal\Core\Entity\EntityStorageInterface
+   */
   protected EntityStorageInterface $mediaStorage;
 
+  /**
+   * Constructor.
+   */
   public function __construct(
     EntityTypeManagerInterface $entity_type_manager
   ) {
@@ -25,7 +34,7 @@ class DiscoverOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriver 
   /**
    * {@inheritdoc}
    */
-  public function discoverImage(ImageDiscoveryImage $event) : void {
+  public function discoverImage(ImageDiscoveryEvent $event) : void {
     $node = $event->getEntity();
 
     if (!($node instanceof NodeInterface)) {

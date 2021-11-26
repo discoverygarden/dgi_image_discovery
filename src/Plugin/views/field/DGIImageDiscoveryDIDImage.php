@@ -2,8 +2,6 @@
 
 namespace Drupal\dgi_image_discovery\Plugin\views\field;
 
-use Drupal\node\NodeInterface;
-use Drupal\views\ResultRow;
 use Drupal\views\Plugin\views\field\EntityField;
 
 /**

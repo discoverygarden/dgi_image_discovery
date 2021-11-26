@@ -2,8 +2,7 @@
 
 namespace Drupal\dgi_image_discovery;
 
-use Drupal\media\MediaInterface;
-use Drupal\node\NodeInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 
@@ -13,6 +12,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class ImageDiscovery implements ImageDiscoveryInterface {
 
   /**
+   * The event dispatcher service.
+   *
    * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
    */
   protected EventDispatcherInterface $eventDispatcher;
@@ -29,14 +30,21 @@ class ImageDiscovery implements ImageDiscoveryInterface {
   /**
    * {@inheritdoc}
    */
-  public function getImage(NodeInterface $node) : ?MediaInterface {
+  public function getImage(ContentEntityInterface $entity) : ImageDiscoveryEvent {
     // Discover the media...
-    $event = $this->eventDispatcher->dispatch(new ImageDiscoveryEvent($node), ImageDiscoveryEvent::EVENT_NAME);
+    $event = $this->eventDispatcher->dispatch(
+      new ImageDiscoveryEvent($entity),
+      ImageDiscoveryEvent::EVENT_NAME
+    );
 
-    // ... and allow things to respond/interact with what was discovered.
-    $post_event = $this->eventDispatcher->dispatch(new ImageDiscoveredEvent($event), ImageDiscoveredEvent::EVENT_NAME);
+    // ... and allow things to respond/interact with what was discovered, before
+    // it is used.
+    $post_event = $this->eventDispatcher->dispatch(
+      new ImageDiscoveredEvent($event),
+      ImageDiscoveredEvent::EVENT_NAME
+    );
 
-    return $post_event->getEvent()->getMedia();
+    return $post_event->getEvent();
   }
 
 }

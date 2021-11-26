@@ -2,20 +2,22 @@
 
 namespace Drupal\dgi_image_discovery;
 
-use Drupal\media\MediaInterface;
-use Drupal\node\NodeInterface;
+use Drupal\Core\Entity\ContentEntityInterface;
 
+/**
+ * Discovery service interface.
+ */
 interface ImageDiscoveryInterface {
 
   /**
    * Attempt get to get an image representing the given node.
    *
-   * @param \Drupal\node\NodeInterface $node
-   *   The node for which to discover an image.
+   * @param \Drupal\Core\Entity\ContentEntityInterface $entity
+   *   The entity for which to discover an image.
    *
-   * @return \Drupal\media\MediaInterface|null
-   *   The discovered media if one could be found; otherwise, null.
+   * @return \Drupal\dgi_image_discovery\ImageDiscoveryEvent
+   *   The result of image discovery.
    */
-  public function getImage(NodeInterface $node) : ?MediaInterface;
+  public function getImage(ContentEntityInterface $entity) : ImageDiscoveryEvent;
 
 }

@@ -2,10 +2,12 @@
 
 namespace Drupal\dgi_image_discovery;
 
-use Drupal\Core\Field\FieldItemList;
 use Drupal\Core\TypedData\ComputedItemListTrait;
 use Drupal\Core\Field\EntityReferenceFieldItemList;
 
+/**
+ * Boiler-plate for our computed field.
+ */
 class DIDImageItemList extends EntityReferenceFieldItemList {
 
   use ComputedItemListTrait;

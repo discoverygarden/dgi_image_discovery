@@ -22,6 +22,6 @@ services:
     tags:
       - name: event_subscriber
   dgi_image_discovery.discover_representative_subscriber:
-    class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverRepresentativeThumbnailSubscriber'
+    class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverRepresentativeImageSubscriber'
     tags:
       - name: event_subscriber

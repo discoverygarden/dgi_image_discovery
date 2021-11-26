@@ -2,16 +2,10 @@
 
 namespace Drupal\dgi_image_discovery\Plugin\Field\FieldType;
 
-use Drupal\image\Plugin\Field\FieldType\ImageItem;
-use Drupal\media\MediaInterface;
-use Drupal\node\NodeInterface;
+use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 
-use Drupal\Core\Cache\CacheableMetadata;
-use Drupal\Core\Cache\CacheBackendInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
-use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
@@ -32,7 +26,19 @@ class DIDImageItem extends EntityReferenceItem implements RefinableCacheableDepe
 
   use RefinableCacheableDependencyTrait;
 
+  /**
+   * The image discovery service.
+   *
+   * @var \Drupal\dgi_image_discovery\ImageDiscoveryInterface
+   */
   protected ImageDiscoveryInterface $discoveryService;
+
+  /**
+   * Memoize that we have already determined the value.
+   *
+   * @var bool
+   */
+  protected bool $isCalculated = FALSE;
 
   /**
    * {@inheritdoc}
@@ -56,6 +62,7 @@ class DIDImageItem extends EntityReferenceItem implements RefinableCacheableDepe
     $this->ensureCalculated();
     return parent::__get($name);
   }
+
   /**
    * {@inheritdoc}
    */
@@ -79,8 +86,10 @@ class DIDImageItem extends EntityReferenceItem implements RefinableCacheableDepe
     if (!$this->isCalculated) {
       $entity = $this->getEntity();
       if (!$entity->isNew()) {
-        if ($value = $this->discoveryService->getImage($entity)) {
-          $this->setValue($value);
+        $event = $this->discoveryService->getImage($entity);
+        $this->addCacheableDependency($event);
+        if ($event->hasMedia()) {
+          $this->setValue($event->getMedia());
         }
       }
       $this->isCalculated = TRUE;

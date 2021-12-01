@@ -1,0 +1,27 @@
+---
+services:
+  dgi_image_discovery.views_field_subscriber:
+    class: '\Drupal\dgi_image_discovery\EventSubscriber\ViewsFieldSubscriber'
+    tags:
+      - name: event_subscriber
+  dgi_image_discovery.service:
+    class: '\Drupal\dgi_image_discovery\ImageDiscovery'
+    arguments:
+      - '@event_dispatcher'
+  dgi_image_discovery.discover_child_subscriber:
+    class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverChildThumbnailSubscriber'
+    arguments:
+      - '@dgi_image_discovery.service'
+      - '@entity_type.manager'
+    tags:
+      - name: event_subscriber
+  dgi_image_discovery.discover_owned_subscriber:
+    class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverOwnedThumbnailSubscriber'
+    arguments:
+      - '@entity_type.manager'
+    tags:
+      - name: event_subscriber
+  dgi_image_discovery.discover_representative_subscriber:
+    class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverRepresentativeImageSubscriber'
+    tags:
+      - name: event_subscriber

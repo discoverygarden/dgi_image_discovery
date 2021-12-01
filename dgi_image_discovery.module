@@ -1,0 +1,55 @@
+<?php
+
+/**
+ * @file
+ * General hook implementations.
+ */
+
+use Drupal\dgi_image_discovery\DIDImageItemList;
+
+use Drupal\Core\Entity\EntityTypeInterface;
+use Drupal\Core\Field\BaseFieldDefinition;
+
+/**
+ * Implements hook_entity_base_field_info().
+ */
+function dgi_image_discovery_entity_base_field_info(EntityTypeInterface $entity_type) {
+
+  if ($entity_type->id() === 'node') {
+    $fields = [];
+
+    $fields['did_image'] = BaseFieldDefinition::create('did_image')
+      ->setName('did_image')
+      ->setLabel(t('DGI Image Discovery Discovered Image'))
+      ->setDescription(t('Image to represent the given node.'))
+      ->setComputed(TRUE)
+      ->setClass(DIDImageItemList::class)
+      ->setDisplayConfigurable('view', TRUE)
+      ->setSetting('target_type', 'media');
+
+    return $fields;
+  }
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function dgi_image_discovery_field_formatter_info_alter(array &$info) {
+  $info['media_thumbnail']['field_types'][] = 'did_image';
+}
+
+/**
+ * Implements hook_views_data_alter().
+ */
+function dgi_image_discovery_views_data_alter(array &$data) {
+  $table = 'node';
+  if (isset($data[$table])) {
+    $data[$table]['did_image'] = [
+      'title' => t('DGI Image Discovery Discovered Image'),
+      'field' => [
+        'id' => 'did_image',
+        'field_name' => 'did_image',
+      ],
+    ];
+  }
+}

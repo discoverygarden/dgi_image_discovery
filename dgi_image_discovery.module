@@ -53,3 +53,16 @@ function dgi_image_discovery_views_data_alter(array &$data) {
     ];
   }
 }
+
+/**
+ * Implements hook_menu().
+ */
+function dgi_image_discovery_menu() {
+  $items['/admin/config/dgi_image_discovery/adminsettings'] = [
+    'title' => 'Discoverygarden Image Discovery Settings',
+    'description' => "Configure settings for the Discoverygarden Image Discovery module",
+    'route_name' => 'dgi_image_discovery.admin_settings_form',
+  ];
+
+  return $items;
+}

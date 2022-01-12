@@ -9,6 +9,8 @@ use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\node\Entity\Node;
+use Drupal\taxonomy\Entity\Term;
 
 /**
  * Find image media related to the given node.
@@ -90,6 +92,24 @@ class DIDImageItem extends EntityReferenceItem implements RefinableCacheableDepe
         $this->addCacheableDependency($event);
         if ($event->hasMedia()) {
           $this->setValue($event->getMedia());
+        }
+        else {
+          // Set the default configured media, if available.
+          $config = \Drupal::config('dgi_image_discovery.adminsettings');
+          $default_node = Node::load($config->get('did_image_discovery_default'));
+          if ($default_node) {
+            $media_use_term = Term::load($config->get('did_image_discovery_media_use'));
+            if ($media_use_term) {
+              $islandoraUtils = \Drupal::service('islandora.utils');
+              $media = $islandoraUtils->getMediaWithTerm(
+                $default_node,
+                $media_use_term
+              );
+              if ($media) {
+                $this->setValue($media);
+              }
+            }
+          }
         }
       }
       $this->isCalculated = TRUE;

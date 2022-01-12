@@ -1,0 +1,6 @@
+dgi_image_discovery.admin_settings_form:
+  title: 'DGI Image Discovery configuration'
+  route_name: dgi_image_discovery.admin_settings_form
+  description: 'Configure DGI Image Discovery settings'
+  parent: system.admin_config_system
+  weight: 99

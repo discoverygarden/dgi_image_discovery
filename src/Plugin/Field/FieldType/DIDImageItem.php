@@ -85,6 +85,7 @@ class DIDImageItem extends EntityReferenceItem implements RefinableCacheableDepe
   protected function ensureCalculated() {
     if (!$this->isCalculated) {
       $entity = $this->getEntity();
+      $this->target_id = $entity->id();
       if (!$entity->isNew()) {
         $event = $this->discoveryService->getImage($entity);
         $this->addCacheableDependency($event);

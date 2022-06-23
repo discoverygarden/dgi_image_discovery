@@ -90,7 +90,8 @@ class DIDImageItem extends EntityReferenceItem implements RefinableCacheableDepe
         $this->addCacheableDependency($event);
         if ($event->hasMedia()) {
           $this->setValue($event->getMedia());
-        } else {
+        }
+        else {
           $this->target_id = -1;
         }
       }

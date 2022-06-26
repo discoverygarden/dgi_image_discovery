@@ -24,7 +24,10 @@ class DIDImageItemList extends EntityReferenceFieldItemList {
    */
   protected function ensurePopulated() {
     if (!isset($this->list[0])) {
-      $this->list[0] = $this->createItem(0);
+      $item = $this->createItem(0);
+      if (!$item->isEmpty()) {
+        $this->list[0] = $item;
+      }
     }
   }
 

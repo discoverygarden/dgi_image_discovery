@@ -22,8 +22,7 @@ class DiscoverRepresentativeImageSubscriber extends AbstractImageDiscoverySubscr
       return;
     }
 
-    $representative = $entity->field_representative_image->entity;
-    if ($representative) {
+    if ($representative = ($entity->field_representative_image->entity ?? FALSE)) {
       $access = $representative->access('view', NULL, TRUE);
       $event->addCacheableDependency($access);
 

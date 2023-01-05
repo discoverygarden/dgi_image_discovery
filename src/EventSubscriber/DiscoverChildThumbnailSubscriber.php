@@ -14,24 +14,14 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
  */
 class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber {
 
-  const PRIORITY = 800;
+  const PRIORITY = 850;
 
   /**
-   * The "depth" to which we have traversed.
-   *
-   * To avoid infinite recursion, we track how far we have gone, so we can break
-   * the chain somewhere.
-   *
-   * @var int
-   */
-  protected int $depth;
-
-  /**
-   * The node storage service of which to query/load nodes.
+   * The media storage service of which to query/load media.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
-  protected EntityStorageInterface $nodeStorage;
+  protected EntityStorageInterface $mediaStorage;
 
   /**
    * The image discovery service.
@@ -44,12 +34,9 @@ class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
    * Constructor.
    */
   public function __construct(
-    ImageDiscoveryInterface $image_discovery,
     EntityTypeManagerInterface $entity_type_manager
   ) {
-    $this->imageDiscovery = $image_discovery;
-    $this->nodeStorage = $entity_type_manager->getStorage('node');
-    $this->depth = 0;
+    $this->mediaStorage = $entity_type_manager->getStorage('media');
   }
 
   /**
@@ -61,40 +48,23 @@ class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
     if (!($node instanceof NodeInterface)) {
       return;
     }
-    elseif ($this->depth + 1 > 3) {
-      // Exhausted depth.
-      return;
+
+    $results = $this->mediaStorage->getQuery()
+      ->condition('field_media_of.entity:field_member_of', $node->id())
+      ->condition('field_media_use.entity:taxonomy_term.field_external_uri.uri', 'http://pcdm.org/use#ThumbnailImage')
+      ->accessCheck()
+      ->range(0, 1)
+      ->execute();
+
+    $event->addCacheTags(['media_list']);
+
+    if ($results) {
+      $media = $this->mediaStorage->load(reset($results));
+
+      $event->addCacheableDependency($media->access('view', NULL, TRUE))
+        ->setMedia($media)
+        ->stopPropagation();
     }
-
-    try {
-      $this->depth += 1;
-
-      $results = $this->nodeStorage->getQuery()
-        ->condition('field_member_of', $node->id())
-        ->sort('field_weight')
-        ->accessCheck()
-        ->range(0, 1)
-        ->execute();
-
-      $event->addCacheTags(['node_list']);
-
-      if ($results) {
-        $child = $this->nodeStorage->load(reset($results));
-
-        $event->addCacheableDependency($child->access('view', NULL, TRUE));
-
-        $child_event = $this->imageDiscovery->getImage($child);
-        $event->addCacheableDependency($child_event);
-        if ($child_event->hasMedia()) {
-          $event->setMedia($child_event->getMedia())
-            ->stopPropagation();
-        }
-      }
-    }
-    finally {
-      $this->depth -= 1;
-    }
-
   }
 
 }

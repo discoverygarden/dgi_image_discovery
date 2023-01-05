@@ -11,6 +11,12 @@ services:
   dgi_image_discovery.discover_child_subscriber:
     class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverChildThumbnailSubscriber'
     arguments:
+      - '@entity_type.manager'
+    tags:
+      - name: event_subscriber
+  dgi_image_discovery.discover_child_delegate_subscriber:
+    class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverChildThumbnailDelegateSubscriber'
+    arguments:
       - '@dgi_image_discovery.service'
       - '@entity_type.manager'
     tags:

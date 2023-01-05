@@ -5,7 +5,6 @@ namespace Drupal\dgi_image_discovery\EventSubscriber;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\dgi_image_discovery\ImageDiscoveryEvent;
-use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\node\NodeInterface;
 
 /**

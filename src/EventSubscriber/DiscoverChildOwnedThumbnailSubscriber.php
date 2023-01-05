@@ -42,7 +42,7 @@ class DiscoverChildOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscr
     }
 
     $results = $this->mediaStorage->getQuery()
-      ->condition('field_media_of.entity:field_member_of', $node->id())
+      ->condition('field_media_of.entity:node.field_member_of', $node->id())
       ->condition('field_media_use.entity:taxonomy_term.field_external_uri.uri', 'http://pcdm.org/use#ThumbnailImage')
       ->accessCheck()
       ->range(0, 1)

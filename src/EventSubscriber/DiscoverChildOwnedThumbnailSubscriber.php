@@ -12,7 +12,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 /**
  * Discovery child thumbnails.
  */
-class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber {
+class DiscoverChildOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriber {
 
   const PRIORITY = 850;
 

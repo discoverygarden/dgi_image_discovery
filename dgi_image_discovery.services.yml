@@ -8,8 +8,8 @@ services:
     class: '\Drupal\dgi_image_discovery\ImageDiscovery'
     arguments:
       - '@event_dispatcher'
-  dgi_image_discovery.discover_child_subscriber:
-    class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverChildThumbnailSubscriber'
+  dgi_image_discovery.discover_child_owned_subscriber:
+    class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverChildOwnedThumbnailSubscriber'
     arguments:
       - '@entity_type.manager'
     tags:

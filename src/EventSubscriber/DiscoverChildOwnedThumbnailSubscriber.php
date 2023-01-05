@@ -48,7 +48,7 @@ class DiscoverChildOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscr
       ->range(0, 1)
       ->execute();
 
-    $event->addCacheTags(['media_list']);
+    $event->addCacheTags(['node_list', 'media_list']);
 
     if ($results) {
       $media = $this->mediaStorage->load(reset($results));

@@ -3,32 +3,24 @@
 namespace Drupal\dgi_image_discovery\EventSubscriber;
 
 use Drupal\dgi_image_discovery\ImageDiscoveryEvent;
-use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\node\NodeInterface;
 
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
- * Discovery child thumbnails.
+ * Discover thumbnails which are owned by children of a given object.
  */
 class DiscoverChildOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriber {
 
   const PRIORITY = 850;
 
   /**
-   * The media storage service of which to query/load media.
+   * The media storage service of which to query/load media objects.
    *
    * @var \Drupal\Core\Entity\EntityStorageInterface
    */
   protected EntityStorageInterface $mediaStorage;
-
-  /**
-   * The image discovery service.
-   *
-   * @var \Drupal\dgi_image_discovery\ImageDiscoveryInterface
-   */
-  protected ImageDiscoveryInterface $imageDiscovery;
 
   /**
    * Constructor.

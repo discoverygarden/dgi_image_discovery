@@ -72,6 +72,9 @@ class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
       $results = $this->nodeStorage->getQuery()
         ->condition('field_member_of', $node->id())
         ->sort('field_weight')
+        // XXX: field_weight is nullable or not unique, so break ties by sorting
+        // on the node ID.
+        ->sort('nid')
         ->accessCheck()
         ->range(0, 1)
         ->execute();

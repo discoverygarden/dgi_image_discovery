@@ -1,18 +1,19 @@
 # DGI Image Discovery
+
 ## Introduction
 
-A module to facilitate image discovery for islandora repository items.
+A module to facilitate image discovery for Islandora repository items.
 
 ## Requirements
 
 This module requires the following modules/libraries:
 
-* [islandora](https://github.com/Islandora/islandora/tree/8.x-1.x)
+* [Islandora](https://github.com/Islandora/islandora/)
 
 ## Installation
 
 Install as usual, see
-[this](https://drupal.org/documentation/install/modules-themes/modules-8) for
+[this](https://www.drupal.org/docs/extending-drupal/installing-modules) for
 further information.
 
 ## Usage
@@ -38,7 +39,6 @@ Current maintainers:
 
 ## Development
 
-An example migration and cmd that can help with development is provided.
-If you would like to contribute to this module create an issue, pull request
-and or contact
+If you would like to contribute to this module, create an issue, pull request
+and/or contact
 [discoverygarden](http://support.discoverygarden.ca).

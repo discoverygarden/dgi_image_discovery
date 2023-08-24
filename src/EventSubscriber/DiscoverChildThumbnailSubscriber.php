@@ -75,22 +75,36 @@ class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
         // XXX: field_weight is nullable or not unique, so break ties by sorting
         // on the node ID.
         ->sort('nid')
-        ->accessCheck()
+        ->accessCheck(FALSE)
         ->range(0, 1)
         ->execute();
 
       $event->addCacheTags(['node_list']);
 
-      if ($results) {
-        $child = $this->nodeStorage->load(reset($results));
+      foreach ($results as $result) {
+        $child = $this->nodeStorage->load($result);
 
-        $event->addCacheableDependency($child->access('view', NULL, TRUE));
+        $access_result = $child->access('view', NULL, TRUE);
+        $event->addCacheableDependency($access_result)
+          ->addCacheableDependency($child);
+
+        if (!$access_result->isAllowed()) {
+          continue;
+        }
 
         $child_event = $this->imageDiscovery->getImage($child);
         $event->addCacheableDependency($child_event);
         if ($child_event->hasMedia()) {
-          $event->setMedia($child_event->getMedia())
+          $media = $child_event->getMedia();
+          $media_access = $media->access('view', NULL, TRUE);
+          $event->addCacheableDependency($media_access)
+            ->addCacheableDependency($media);
+          if (!$media_access->isAllowed()) {
+            continue;
+          }
+          $event->setMedia($media)
             ->stopPropagation();
+          break;
         }
       }
     }

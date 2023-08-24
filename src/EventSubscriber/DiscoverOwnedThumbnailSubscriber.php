@@ -44,17 +44,23 @@ class DiscoverOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
     $results = $this->mediaStorage->getQuery()
       ->condition('field_media_of', $node->id())
       ->condition('field_media_use.entity:taxonomy_term.field_external_uri.uri', 'http://pcdm.org/use#ThumbnailImage')
-      ->accessCheck()
+      ->accessCheck(FALSE)
       ->range(0, 1)
       ->execute();
 
     $event->addCacheTags(['media_list']);
 
-    if ($results) {
-      $media = $this->mediaStorage->load(reset($results));
+    foreach ($results as $result) {
+      $media = $this->mediaStorage->load($result);
+      $media_access = $media->access('view', NULL, TRUE);
+      $event->addCacheableDependency($media_access)
+        ->addCacheableDependency($media);
 
-      $event->addCacheableDependency($media->access('view', NULL, TRUE))
-        ->setMedia($media)
+      if (!$media_access->isAllowed()) {
+        continue;
+      }
+
+      $event->setMedia($media)
         ->stopPropagation();
     }
   }

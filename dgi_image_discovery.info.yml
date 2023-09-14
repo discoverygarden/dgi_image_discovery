@@ -2,7 +2,7 @@ name: DGI Image Discovery
 description: Repository object augmentation.
 package: DGI Helpers
 type: module
-core_version_requirement: ^8 || ^9
+core_version_requirement: ^9 || ^10
 dependencies:
   - drupal:image
   - islandora:islandora

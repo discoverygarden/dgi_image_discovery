@@ -12,17 +12,17 @@ This module requires the following modules/libraries:
 ## Installation
 
 Install as usual, see
-[this](https://drupal.org/documentation/install/modules-themes/modules-8) for
+[this](https://www.drupal.org/docs/extending-drupal/installing-modules) for
 further information.
 
 ## Usage
 
-This module allow for image discovery on parent aggregate objects such as 
+This module allow for image discovery on parent aggregate objects such as
 collections, compounds and paged objects.
 
 ## Configuration
 
-When configuring a content view, add and configure the virtual field 
+When configuring a content view, add and configure the virtual field
 "DGI Image Discovery Discovered Image".
 
 ## Troubleshooting/Issues

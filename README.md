@@ -42,3 +42,7 @@ Current maintainers:
 If you would like to contribute to this module, create an issue, pull request
 and/or contact
 [discoverygarden](http://support.discoverygarden.ca).
+
+## License
+
+[GPLv3](http://www.gnu.org/licenses/gpl-3.0.txt)

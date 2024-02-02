@@ -48,6 +48,18 @@ class DiscoverOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
       ->range(0, 1)
       ->execute();
 
+    // If there is no thumbnail, see if there is an Original File Image Media
+    // entity to style as a thumbnail instead.
+    if (empty($results)) {
+      $results = $this->mediaStorage->getQuery()
+        ->condition('field_media_of', $node->id())
+        ->condition('bundle', 'image')
+        ->condition('field_media_use.entity:taxonomy_term.field_external_uri.uri', 'http://pcdm.org/use#OriginalFile')
+        ->accessCheck()
+        ->range(0, 1)
+        ->execute();
+    }
+
     $event->addCacheTags(['media_list']);
 
     if ($results) {

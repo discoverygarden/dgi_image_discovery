@@ -102,8 +102,11 @@ class IslandoraObjectImageDiscovery extends ProcessorPluginBase implements Conta
     if (!$entity->isNew() && $entity instanceof NodeInterface) {
       $event = $this->imageDiscovery->getImage($entity);
       if ($event->hasMedia()) {
-        $value = $this->entityTypeManager->getStorage('image_style')->load('solr_grid_thumbnail')
-          ->buildUrl($event->getMedia()->field_media_image->entity->getFileUri());
+        $image = $event->getMedia()->field_media_image;
+        if (!empty($image)) {
+          $value = $this->entityTypeManager->getStorage('image_style')->load('solr_grid_thumbnail')
+            ->buildUrl($image->entity->getFileUri());
+        }
       }
     }
 

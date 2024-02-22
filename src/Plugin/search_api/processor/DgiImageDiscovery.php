@@ -5,19 +5,19 @@ namespace Drupal\dgi_image_discovery\Plugin\search_api\processor;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
+use Drupal\dgi_image_discovery\Plugin\search_api\processor\Property\DgiImageDiscoveryProperty;
 use Drupal\node\NodeInterface;
 use Drupal\search_api\Datasource\DatasourceInterface;
 use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Processor\ProcessorPluginBase;
-use Drupal\search_api\Processor\ProcessorProperty;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Get the styled image url for the islandora node.
  *
  * @SearchApiProcessor(
- *   id = "islandora_object_image_discovery",
- *   label = @Translation("Islandora Object Image Discovery"),
+ *   id = "dgi_image_discovery",
+ *   label = @Translation("DGI Image Discovery"),
  *   description = @Translation("Get the styled image url for the islandora node."),
  *   stages = {
  *     "add_properties" = 0,
@@ -26,7 +26,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *   hidden = true,
  * )
  */
-class IslandoraObjectImageDiscovery extends ProcessorPluginBase implements ContainerFactoryPluginInterface {
+class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryPluginInterface {
 
   /**
    * The entity type manager service.
@@ -79,13 +79,13 @@ class IslandoraObjectImageDiscovery extends ProcessorPluginBase implements Conta
 
     if (!$datasource) {
       $definition = [
-        'label' => $this->t('Islandora Object Image Discovery'),
+        'label' => $this->t('DGI Image Discovery'),
         'description' => $this->t('Styled Image Url which can then be passed to the image src.'),
         'type' => 'string',
         'is_list' => FALSE,
         'processor_id' => $this->getPluginId(),
       ];
-      $properties['islandora_object_image_discovery'] = new ProcessorProperty($definition);
+      $properties['dgi_image_discovery'] = new DgiImageDiscoveryProperty($definition);
     }
 
     return $properties;
@@ -101,19 +101,24 @@ class IslandoraObjectImageDiscovery extends ProcessorPluginBase implements Conta
     // Get the image discovery URL.
     if (!$entity->isNew() && $entity instanceof NodeInterface) {
       $event = $this->imageDiscovery->getImage($entity);
-      if ($event->hasMedia()) {
-        $image = $event->getMedia()->field_media_image;
-        if (!empty($image)) {
-          $value = $this->entityTypeManager->getStorage('image_style')->load('solr_grid_thumbnail')
-            ->buildUrl($image->entity->getFileUri());
-        }
+      $media = $event->getMedia();
+      if (!empty($media)) {
+        $media_source = $media->getSource();
+        $file_id = $media_source->getSourceFieldValue($media);
+        $image = $this->entityTypeManager->getStorage('file')->load($file_id);
       }
-    }
 
-    $fields = $item->getFields(FALSE);
-    $fields = $this->getFieldsHelper()->filterForPropertyPath($fields, NULL, 'islandora_object_image_discovery');
-    foreach ($fields as $field) {
-      $field->addValue($value);
+      $fields = $item->getFields(FALSE);
+      $fields = $this->getFieldsHelper()->filterForPropertyPath($fields, NULL, 'dgi_image_discovery');
+      foreach ($fields as $field) {
+        $config = $field->getConfiguration();
+        $image_style = $config['image_style'];
+        if (!empty($image)) {
+          $value = $this->entityTypeManager->getStorage('image_style')->load($image_style)
+            ->buildUrl($image->getFileUri());
+        }
+        $field->addValue($value);
+      }
     }
   }
 

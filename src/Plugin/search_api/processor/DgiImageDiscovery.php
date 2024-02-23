@@ -102,10 +102,15 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     if (!$entity->isNew() && $entity instanceof NodeInterface) {
       $event = $this->imageDiscovery->getImage($entity);
       $media = $event->getMedia();
-      if (!empty($media)) {
-        $media_source = $media->getSource();
-        $file_id = $media_source->getSourceFieldValue($media);
-        $image = $this->entityTypeManager->getStorage('file')->load($file_id);
+      if (empty($media)) {
+        return;
+      }
+
+      $media_source = $media->getSource();
+      $file_id = $media_source->getSourceFieldValue($media);
+      $image = $this->entityTypeManager->getStorage('file')->load($file_id);
+      if (empty($image)) {
+        return;
       }
 
       $fields = $item->getFields(FALSE);
@@ -113,10 +118,8 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
       foreach ($fields as $field) {
         $config = $field->getConfiguration();
         $image_style = $config['image_style'];
-        if (!empty($image)) {
-          $value = $this->entityTypeManager->getStorage('image_style')->load($image_style)
-            ->buildUrl($image->getFileUri());
-        }
+        $value = $this->entityTypeManager->getStorage('image_style')->load($image_style)
+          ->buildUrl($image->getFileUri());
         $field->addValue($value);
       }
     }

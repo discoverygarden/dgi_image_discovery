@@ -27,24 +27,14 @@ class DgiImageDiscoveryProperty extends ConfigurablePropertyBase {
    * {@inheritdoc}
    */
   public function buildConfigurationForm(FieldInterface $field, array $form, FormStateInterface $form_state) {
-    $configuration = $field->getConfiguration();
-
-    // Get an array of image styles.
-    $image_styles_array = \Drupal::entityTypeManager()->getStorage('image_style')->loadMultiple();
-    $image_styles = [];
-
-    if (!empty($image_styles_array)) {
-      foreach ($image_styles_array as $id => $style) {
-        $image_styles[$id] = $style->label();
-      }
-    }
+    $configuration = $field->getConfiguration() + $this->defaultConfiguration();
 
     $form['image_style'] = [
       '#type' => 'select',
-      '#options' => $image_styles,
+      '#options' => image_style_options(FALSE),
       '#title' => $this->t('Image Style'),
       '#description' => $this->t('Select the image style that should be applied to derive the DGI Image Discovery image url.'),
-      '#default_value' => $configuration['image_style'] ?? $this->defaultConfiguration()['image_style'],
+      '#default_value' => $configuration['image_style'],
     ];
 
     return $form;

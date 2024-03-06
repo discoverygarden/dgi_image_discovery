@@ -1,0 +1,7 @@
+search_api.property_configuration.dgi_image_discovery:
+  type: mapping
+  label: DGI Image Discovery
+  mapping:
+    image_style:
+      type: string
+      label: 'The image style to be used to create image url'

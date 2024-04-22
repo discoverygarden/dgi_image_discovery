@@ -33,7 +33,7 @@ collections, compounds and paged objects.
 To override the use of the "Islandora" thumbnail, you can add a new field to each of your applicable content types. To do this:
 
 1. In the "Manage fields" page for your content type, choose "Create a new field".
-1. In the "Add a new field" list, choose "Reference > Media".
+1. In the "Add a new field" list, choose "Media" (if on Drupal < 10.3, this is "Reference > Media"
 1. Set the new field's label to "Representative image" so that the machine name of this field is `field_representative_image`. This machine name must be set; you can change the label later if you wish. 
 1. On the next page, in the "Type of item to reference" setting, choose "Media" and leave the "Allowed number of values" at 1.
 1. On the next page, in the "Media type" checkboxes, choose "Image".

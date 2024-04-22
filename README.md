@@ -30,7 +30,7 @@ collections, compounds and paged objects.
 
 ### Adding a "Representative Image" field to your content type
 
-To override the discovered thumbnail, you can add a new field to each of your applicable content types. To do this:
+To override the use of the "Islandora" thumbnail, you can add a new field to each of your applicable content types. To do this:
 
 1. In the "Manage fields" page for your content type, choose "Create a new field".
 1. In the "Add a new field" list, choose "Reference > Media".

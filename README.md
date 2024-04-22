@@ -34,6 +34,8 @@ You will need to add a new field to each of your applicable content types. To do
 1. On the next page, in the "Media type" checkboxes, choose "Image".
 1. Click on "Save settings".
 
+If you are adding the field to more than one content type, you should choose "Re-use an existing field" on subsequent content types.
+
 ### Using the image in Views
 
 When configuring a content view, add and configure the virtual field

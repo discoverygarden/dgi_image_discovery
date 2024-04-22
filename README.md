@@ -23,6 +23,19 @@ collections, compounds and paged objects.
 
 ## Configuration
 
+### Adding the field to your content type
+
+You will need to add a new field to each of your applicable content types. To do this:
+
+1. In the "Manage fields" page for your content type, choose "Create a new field".
+1. In the "Add a new field" list, choose "Reference > Media".
+1. Since the machine name of this field must be `field_representative_image`, you will need to give the new field the lable "Representative image" when you create it. You can can change this label later if you wish.
+1. On the next page, in the "Type of item to reference" setting, choose "Media" and leave the "Allowed number of values" at 1.
+1. On the next page, in the "Media type" checkboxes, choose "Image".
+1. Click on "Save settings".
+
+### Using the image in Views
+
 When configuring a content view, add and configure the virtual field
 "DGI Image Discovery Discovered Image".
 

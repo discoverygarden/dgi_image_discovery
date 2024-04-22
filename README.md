@@ -5,8 +5,8 @@
 A module to facilitate image discovery for Islandora repository items. Image discovery looks for images in the following places and will use the first one found:
 
 * contents of a Media field, `field_representative_image` on the node
-* a thumbnail media, i.e., a media that is "Member of" the node (using `field_member_of`) with a Media Use (`field_media_use`) taxonomy term with External URI (`field_external_uri`) equal to "http://pcdm.org/use#ThumbnailImage"
-* a first child's thumbnail media, i.e. a thumbnail media of the node with lowest weight (`field_weight`) that is a Member Of (`field_member_of`) the node in question. If not found on the first direct child, it will look at the first child's first child, and so forth to a depth of 3. 
+* an "Islandora thumbnail", i.e., a media that is "Member of" the node (using `field_member_of`) with a Media Use (`field_media_use`) taxonomy term with External URI (`field_external_uri`) equal to "http://pcdm.org/use#ThumbnailImage"
+* a first child's Islandora thumbnail media, i.e. the Islanodra thumbnail of the node with lowest weight (`field_weight`) that is a Member Of (`field_member_of`) the node in question. If not found on the first direct child, it will look at the first child's first child, and so forth to a depth of 3. 
 
 
 ## Requirements

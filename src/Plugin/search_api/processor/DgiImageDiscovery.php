@@ -11,6 +11,9 @@ use Drupal\search_api\Datasource\DatasourceInterface;
 use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Processor\ProcessorPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Session\AnonymousUserSession;
+use Drupal\user\Entity\User;
 
 /**
  * Get the styled image url for the islandora node.
@@ -43,6 +46,13 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
   protected $imageDiscovery;
 
   /**
+   * The current user service.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $currentUser;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -50,12 +60,14 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     $plugin_id,
     $plugin_definition,
     ImageDiscoveryInterface $image_discovery,
-    EntityTypeManagerInterface $entity_type_manager
+    EntityTypeManagerInterface $entity_type_manager,
+    AccountProxyInterface $current_user
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->imageDiscovery = $image_discovery;
     $this->entityTypeManager = $entity_type_manager;
+    $this->currentUser = $current_user;
   }
 
   /**
@@ -67,7 +79,8 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
       $plugin_id,
       $plugin_definition,
       $container->get('dgi_image_discovery.service'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('current_user')
     );
   }
 
@@ -95,6 +108,12 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
    * {@inheritdoc}
    */
   public function addFieldValues(ItemInterface $item) {
+    // Save the current user.
+    $current_user = $this->currentUser->getAccount();
+
+    // Set the user to anonymous.
+    $this->currentUser->setAccount(new AnonymousUserSession());
+
     $entity = $item->getOriginalObject()->getValue();
     $value = NULL;
 
@@ -123,6 +142,9 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
         $field->addValue($value);
       }
     }
+
+    // Restore the original user.
+    $this->currentUser->setAccount(User::load($current_user->id()));
   }
 
 }

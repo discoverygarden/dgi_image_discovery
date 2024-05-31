@@ -4,7 +4,6 @@ namespace Drupal\dgi_image_discovery\Plugin\search_api\processor;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
-use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
@@ -46,13 +45,6 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
   protected $imageDiscovery;
 
   /**
-   * The current user service.
-   *
-   * @var \Drupal\Core\Session\AccountProxyInterface
-   */
-  protected $currentUser;
-
-  /**
    * The account switcher service.
    *
    * @var \Drupal\Core\Session\AccountSwitcherInterface
@@ -68,14 +60,12 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     $plugin_definition,
     ImageDiscoveryInterface $image_discovery,
     EntityTypeManagerInterface $entity_type_manager,
-    AccountProxyInterface $current_user,
     AccountSwitcherInterface $account_switcher
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->imageDiscovery = $image_discovery;
     $this->entityTypeManager = $entity_type_manager;
-    $this->currentUser = $current_user;
     $this->accountSwitcher = $account_switcher;
   }
 
@@ -89,7 +79,6 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
       $plugin_definition,
       $container->get('dgi_image_discovery.service'),
       $container->get('entity_type.manager'),
-      $container->get('current_user'),
       $container->get('account_switcher')
     );
   }
@@ -118,9 +107,6 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
    * {@inheritdoc}
    */
   public function addFieldValues(ItemInterface $item) {
-    // Save the current user.
-    $current_user = $this->currentUser->getAccount();
-
     // Switch to anonymous user.
     $this->accountSwitcher->switchTo(new AnonymousUserSession());
 

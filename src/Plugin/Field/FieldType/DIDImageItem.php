@@ -2,13 +2,12 @@
 
 namespace Drupal\dgi_image_discovery\Plugin\Field\FieldType;
 
-use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
-
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Field\Plugin\Field\FieldType\EntityReferenceItem;
 use Drupal\Core\TypedData\DataDefinitionInterface;
 use Drupal\Core\TypedData\TypedDataInterface;
+use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 
 /**
  * Find image media related to the given node.

@@ -2,11 +2,10 @@
 
 namespace Drupal\dgi_image_discovery\EventSubscriber;
 
-use Drupal\dgi_image_discovery\ImageDiscoveryEvent;
-use Drupal\node\NodeInterface;
-
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\dgi_image_discovery\ImageDiscoveryEvent;
+use Drupal\node\NodeInterface;
 
 /**
  * Discover thumbnails which are owned by a given object.

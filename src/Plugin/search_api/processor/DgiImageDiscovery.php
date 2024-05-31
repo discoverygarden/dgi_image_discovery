@@ -4,6 +4,8 @@ namespace Drupal\dgi_image_discovery\Plugin\search_api\processor;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\dgi_image_discovery\Plugin\search_api\processor\Property\DgiImageDiscoveryProperty;
 use Drupal\node\NodeInterface;
@@ -11,9 +13,6 @@ use Drupal\search_api\Datasource\DatasourceInterface;
 use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Processor\ProcessorPluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\Core\Session\AnonymousUserSession;
-use Drupal\user\Entity\User;
 
 /**
  * Get the styled image url for the islandora node.
@@ -144,7 +143,7 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     }
 
     // Restore the original user.
-    $this->currentUser->setAccount(User::load($current_user->id()));
+    $this->currentUser->setAccount($current_user);
   }
 
 }

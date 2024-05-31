@@ -5,6 +5,7 @@ namespace Drupal\dgi_image_discovery\Plugin\search_api\processor;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Session\AccountProxyInterface;
+use Drupal\Core\Session\AccountSwitcherInterface;
 use Drupal\Core\Session\AnonymousUserSession;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\dgi_image_discovery\Plugin\search_api\processor\Property\DgiImageDiscoveryProperty;
@@ -52,6 +53,13 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
   protected $currentUser;
 
   /**
+   * The account switcher service.
+   *
+   * @var \Drupal\Core\Session\AccountSwitcherInterface
+   */
+  protected $accountSwitcher;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -60,13 +68,15 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     $plugin_definition,
     ImageDiscoveryInterface $image_discovery,
     EntityTypeManagerInterface $entity_type_manager,
-    AccountProxyInterface $current_user
+    AccountProxyInterface $current_user,
+    AccountSwitcherInterface $account_switcher
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
     $this->imageDiscovery = $image_discovery;
     $this->entityTypeManager = $entity_type_manager;
     $this->currentUser = $current_user;
+    $this->accountSwitcher = $account_switcher;
   }
 
   /**
@@ -79,7 +89,8 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
       $plugin_definition,
       $container->get('dgi_image_discovery.service'),
       $container->get('entity_type.manager'),
-      $container->get('current_user')
+      $container->get('current_user'),
+      $container->get('account_switcher')
     );
   }
 
@@ -110,8 +121,8 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     // Save the current user.
     $current_user = $this->currentUser->getAccount();
 
-    // Set the user to anonymous.
-    $this->currentUser->setAccount(new AnonymousUserSession());
+    // Switch to anonymous user.
+    $this->accountSwitcher->switchTo(new AnonymousUserSession());
 
     $entity = $item->getOriginalObject()->getValue();
     $value = NULL;
@@ -121,6 +132,8 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
       $event = $this->imageDiscovery->getImage($entity);
       $media = $event->getMedia();
       if (empty($media)) {
+        // Restore the original user before returning.
+        $this->accountSwitcher->switchBack();
         return;
       }
 
@@ -128,6 +141,8 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
       $file_id = $media_source->getSourceFieldValue($media);
       $image = $this->entityTypeManager->getStorage('file')->load($file_id);
       if (empty($image)) {
+        // Restore the original user before returning.
+        $this->accountSwitcher->switchBack();
         return;
       }
 
@@ -143,7 +158,7 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     }
 
     // Restore the original user.
-    $this->currentUser->setAccount($current_user);
+    $this->accountSwitcher->switchBack();
   }
 
 }

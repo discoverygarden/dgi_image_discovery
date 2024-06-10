@@ -2,12 +2,11 @@
 
 namespace Drupal\dgi_image_discovery\EventSubscriber;
 
+use Drupal\Core\Entity\EntityStorageInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\dgi_image_discovery\ImageDiscoveryEvent;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\node\NodeInterface;
-
-use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Discovery child thumbnails.
@@ -45,7 +44,7 @@ class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
    */
   public function __construct(
     ImageDiscoveryInterface $image_discovery,
-    EntityTypeManagerInterface $entity_type_manager
+    EntityTypeManagerInterface $entity_type_manager,
   ) {
     $this->imageDiscovery = $image_discovery;
     $this->nodeStorage = $entity_type_manager->getStorage('node');

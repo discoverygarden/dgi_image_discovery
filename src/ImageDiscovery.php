@@ -22,7 +22,7 @@ class ImageDiscovery implements ImageDiscoveryInterface {
    * Constructor.
    */
   public function __construct(
-    EventDispatcherInterface $event_dispatcher
+    EventDispatcherInterface $event_dispatcher,
   ) {
     $this->eventDispatcher = $event_dispatcher;
   }

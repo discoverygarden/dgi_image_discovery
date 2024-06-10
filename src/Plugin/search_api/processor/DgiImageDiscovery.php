@@ -50,7 +50,7 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     $plugin_id,
     $plugin_definition,
     ImageDiscoveryInterface $image_discovery,
-    EntityTypeManagerInterface $entity_type_manager
+    EntityTypeManagerInterface $entity_type_manager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 

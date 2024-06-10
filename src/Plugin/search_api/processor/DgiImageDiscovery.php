@@ -124,8 +124,8 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
         $configuration = $field->getConfiguration();
 
         // XXX: Adapted from https://git.drupalcode.org/project/search_api/-/blob/8.x-1.x/src/Plugin/search_api/processor/RenderedItem.php#L184-190
-        // If a (non-anonymous) role is selected, then also add the authenticated
-        // user role.
+        // If a (non-anonymous) role is selected, then also add the
+        // authenticated user role.
         $roles = $configuration['roles'] ?? [RoleInterface::ANONYMOUS_ID];
         $authenticated = RoleInterface::AUTHENTICATED_ID;
         if (array_diff($roles, [$authenticated, RoleInterface::ANONYMOUS_ID])) {

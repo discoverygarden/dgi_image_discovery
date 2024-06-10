@@ -4,12 +4,15 @@ namespace Drupal\dgi_image_discovery\Plugin\search_api\processor;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Session\AccountSwitcherInterface;
+use Drupal\Core\Session\UserSession;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\dgi_image_discovery\Plugin\search_api\processor\Property\DgiImageDiscoveryProperty;
 use Drupal\node\NodeInterface;
 use Drupal\search_api\Datasource\DatasourceInterface;
 use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Processor\ProcessorPluginBase;
+use Drupal\user\RoleInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -43,6 +46,13 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
   protected $imageDiscovery;
 
   /**
+   * Drupal's account switcher service.
+   *
+   * @var \Drupal\Core\Session\AccountSwitcherInterface
+   */
+  protected AccountSwitcherInterface $accountSwitcher;
+
+  /**
    * {@inheritdoc}
    */
   public function __construct(
@@ -62,13 +72,17 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static(
+    $instance = new static(
       $configuration,
       $plugin_id,
       $plugin_definition,
       $container->get('dgi_image_discovery.service'),
       $container->get('entity_type.manager')
     );
+
+    $instance->accountSwitcher = $container->get('account_switcher');
+
+    return $instance;
   }
 
   /**
@@ -99,28 +113,48 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     $value = NULL;
 
     // Get the image discovery URL.
-    if (!$entity->isNew() && $entity instanceof NodeInterface) {
-      $event = $this->imageDiscovery->getImage($entity);
-      $media = $event->getMedia();
-      if (empty($media)) {
-        return;
-      }
+    if (!(!$entity->isNew() && $entity instanceof NodeInterface)) {
+      return;
+    }
 
-      $media_source = $media->getSource();
-      $file_id = $media_source->getSourceFieldValue($media);
-      $image = $this->entityTypeManager->getStorage('file')->load($file_id);
-      if (empty($image)) {
-        return;
-      }
+    $fields = $item->getFields(FALSE);
+    $fields = $this->getFieldsHelper()->filterForPropertyPath($fields, NULL, 'dgi_image_discovery');
+    foreach ($fields as $field) {
+      try {
+        $configuration = $field->getConfiguration();
 
-      $fields = $item->getFields(FALSE);
-      $fields = $this->getFieldsHelper()->filterForPropertyPath($fields, NULL, 'dgi_image_discovery');
-      foreach ($fields as $field) {
-        $config = $field->getConfiguration();
-        $image_style = $config['image_style'];
-        $value = $this->entityTypeManager->getStorage('image_style')->load($image_style)
+        // XXX: Adapted from https://git.drupalcode.org/project/search_api/-/blob/8.x-1.x/src/Plugin/search_api/processor/RenderedItem.php#L184-190
+        // If a (non-anonymous) role is selected, then also add the authenticated
+        // user role.
+        $roles = $configuration['roles'] ?? [RoleInterface::ANONYMOUS_ID];
+        $authenticated = RoleInterface::AUTHENTICATED_ID;
+        if (array_diff($roles, [$authenticated, RoleInterface::ANONYMOUS_ID])) {
+          $roles[$authenticated] = $authenticated;
+        }
+
+        $this->accountSwitcher->switchTo(new UserSession(['roles' => array_values($roles)]));
+
+        $event = $this->imageDiscovery->getImage($entity);
+        $media = $event->getMedia();
+        if (empty($media)) {
+          continue;
+        }
+
+        $media_source = $media->getSource();
+        $file_id = $media_source->getSourceFieldValue($media);
+        $image = $this->entityTypeManager->getStorage('file')->load($file_id);
+        if (empty($image)) {
+          continue;
+        }
+
+        $image_style = $configuration['image_style'];
+        $value = $this->entityTypeManager->getStorage('image_style')
+          ->load($image_style)
           ->buildUrl($image->getFileUri());
         $field->addValue($value);
+      }
+      finally {
+        $this->accountSwitcher->switchBack();
       }
     }
   }

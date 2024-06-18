@@ -18,14 +18,14 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 
 /**
- * Plugin implementation for deferred URL resolution.
+ * Plugin implementation for deferred URL resolution via subrequest.
  */
 #[DeferredResolution(
   id: "subrequest",
   label: new TranslatableMarkup("Subrequest to stream the image directly."),
   description: new TranslatableMarkup("Perform a subrequest to stream the image directly."),
 )]
-final class Subrequest extends DeferredResolutionPluginBase {
+class Subrequest extends DeferredResolutionPluginBase {
 
   /**
    * Drupal's HTTP kernel.

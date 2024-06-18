@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
   label: new TranslatableMarkup("Pre-generated URLs"),
   description: new TranslatableMarkup("Generate full URLs to styled images that should be used. Can be problematic with cache invalidation and/or indexing."),
 )]
-final class PreGenerated extends UrlGeneratorPluginBase implements ContainerFactoryPluginInterface {
+class PreGenerated extends UrlGeneratorPluginBase implements ContainerFactoryPluginInterface {
 
   use UrlGenerationTrait;
 
@@ -45,30 +45,7 @@ final class PreGenerated extends UrlGeneratorPluginBase implements ContainerFact
    * {@inheritDoc}
    */
   public function generate(NodeInterface $node, ImageStyleInterface $style): GeneratedUrl {
-    $generated_url = (new GeneratedUrl())
-      ->addCacheableDependency($node)
-      ->addCacheableDependency($style);
-
-    $event = $this->imageDiscovery->getImage($node);
-    $generated_url->addCacheableDependency($event);
-    $media = $event->getMedia();
-    if (empty($media)) {
-      return $generated_url;
-    }
-
-    $generated_url->addCacheableDependency($media);
-
-    $media_source = $media->getSource();
-    $file_id = $media_source->getSourceFieldValue($media);
-    /** @var \Drupal\file\FileInterface|null $image */
-    $image = $this->entityTypeManager->getStorage('file')->load($file_id);
-    if (empty($image)) {
-      return $generated_url;
-    }
-
-    $generated_url->addCacheableDependency($image);
-
-    return $generated_url->setGeneratedUrl($style->buildUri($image->getFileUri()));
+    return $this->getGeneratedUrl($node, $style);
   }
 
   /**

@@ -13,14 +13,14 @@ use Drupal\image\ImageStyleInterface;
 use Drupal\node\NodeInterface;
 
 /**
- * Plugin implementation for deferred URL resolution.
+ * Plugin implementation for deferred URL resolution via redirect.
  */
 #[DeferredResolution(
   id: "redirect",
   label: new TranslatableMarkup("Redirect to styled image URL"),
   description: new TranslatableMarkup("Explicitly redirect to the styled image URL"),
 )]
-final class Redirect extends DeferredResolutionPluginBase {
+class Redirect extends DeferredResolutionPluginBase {
 
   /**
    * {@inheritDoc}

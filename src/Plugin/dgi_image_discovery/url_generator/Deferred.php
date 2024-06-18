@@ -20,7 +20,7 @@ use Drupal\node\NodeInterface;
   label: new TranslatableMarkup("Deferred URL resolution"),
   description: new TranslatableMarkup("Generate URLs making use of our deferred resolution endpoint."),
 )]
-final class Deferred extends UrlGeneratorPluginBase {
+class Deferred extends UrlGeneratorPluginBase {
 
   /**
    * {@inheritDoc}

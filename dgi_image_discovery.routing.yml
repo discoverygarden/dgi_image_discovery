@@ -1,0 +1,13 @@
+---
+dgi_image_discovery.deferred_resolution:
+  path: '/dgi_image_discovery/{style}/{node}'
+  defaults:
+    _controller: 'dgi_image_discovery.deferred_resolution_controller:resolve'
+  requirements:
+    _entity_access: node.view
+  options:
+    parameters:
+      style:
+        type: entity:image_style
+      node:
+        type: entity:node

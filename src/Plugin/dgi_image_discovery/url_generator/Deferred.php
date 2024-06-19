@@ -29,8 +29,8 @@ class Deferred extends UrlGeneratorPluginBase {
     return Url::fromRoute(
       'dgi_image_discovery.deferred_resolution',
       [
-        'node' => $node,
-        'style' => $style,
+        'node' => $node->id(),
+        'style' => $style->id(),
       ],
       [
         'absolute' => TRUE,

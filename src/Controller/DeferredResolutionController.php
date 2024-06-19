@@ -4,6 +4,8 @@ namespace Drupal\dgi_image_discovery\Controller;
 
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Render\RenderContext;
+use Drupal\Core\Render\RendererInterface;
 use Drupal\dgi_image_discovery\DeferredResolutionPluginManagerInterface;
 use Drupal\image\ImageStyleInterface;
 use Drupal\node\NodeInterface;
@@ -19,6 +21,7 @@ class DeferredResolutionController implements ContainerInjectionInterface {
    */
   public function __construct(
     protected DeferredResolutionPluginManagerInterface $deferredResolutionPluginManager,
+    protected RendererInterface $renderer,
   ) {}
 
   /**
@@ -27,6 +30,7 @@ class DeferredResolutionController implements ContainerInjectionInterface {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('plugin.manager.dgi_image_discovery.url_generator.deferred'),
+      $container->get('renderer'),
     );
   }
 
@@ -44,11 +48,23 @@ class DeferredResolutionController implements ContainerInjectionInterface {
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   public function resolve(ImageStyleInterface $style, NodeInterface $node) : CacheableResponseInterface {
-    // @todo Make plugin configurable.
-    /** @var \Drupal\dgi_image_discovery\DeferredResolutionInterface $plugin */
-    $plugin = $this->deferredResolutionPluginManager->createInstance('redirect');
+    $context = new RenderContext();
+    /** @var \Drupal\Core\Cache\CacheableResponseInterface $response */
+    $response = $this->renderer->executeInRenderContext($context, function () use ($style, $node) {
+      // @todo Make plugin configurable.
+      /** @var \Drupal\dgi_image_discovery\DeferredResolutionInterface $plugin */
+      $plugin = $this->deferredResolutionPluginManager->createInstance('redirect');
 
-    return $plugin->resolve($node, $style);
+      return $plugin->resolve($node, $style);
+    });
+
+    if (!$context->isEmpty()) {
+      $metadata = $context->pop();
+      $response->addCacheableDependency($metadata);
+    }
+
+    return $response;
+
   }
 
 }

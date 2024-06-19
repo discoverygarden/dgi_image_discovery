@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Drupal\dgi_image_discovery\Plugin\dgi_image_discovery\url_generator;
+namespace Drupal\dgi_image_discovery\Plugin\dgi_image_discovery\url_generator\deferred;
 
 use Drupal\Core\Cache\CacheableRedirectResponse;
 use Drupal\Core\Cache\CacheableResponseInterface;

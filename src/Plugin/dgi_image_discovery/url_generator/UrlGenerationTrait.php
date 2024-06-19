@@ -67,7 +67,7 @@ trait UrlGenerationTrait {
 
     $generated_url->addCacheableDependency($image);
 
-    return $generated_url->setGeneratedUrl($style->buildUri($image->getFileUri()));
+    return $generated_url->setGeneratedUrl($style->buildUrl($image->getFileUri()));
   }
 
 }

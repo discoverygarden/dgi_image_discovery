@@ -51,9 +51,9 @@ class DeferredResolutionController implements ContainerInjectionInterface {
     $context = new RenderContext();
     /** @var \Drupal\Core\Cache\CacheableResponseInterface $response */
     $response = $this->renderer->executeInRenderContext($context, function () use ($style, $node) {
-      // @todo Make plugin configurable.
+      // @todo Make plugin configurable?
       /** @var \Drupal\dgi_image_discovery\DeferredResolutionInterface $plugin */
-      $plugin = $this->deferredResolutionPluginManager->createInstance('redirect');
+      $plugin = $this->deferredResolutionPluginManager->createInstance(getenv('DGI_IMAGE_DISCOVERY_DEFERRED_PLUGIN') ?: 'subrequest');
 
       return $plugin->resolve($node, $style);
     });

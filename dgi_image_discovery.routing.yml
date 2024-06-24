@@ -1,6 +1,6 @@
 ---
 dgi_image_discovery.deferred_resolution:
-  path: '/dgi_image_discovery/{style}/{node}'
+  path: '/node/{node}/dgi_image_discovery/{style}'
   defaults:
     _controller: 'dgi_image_discovery.deferred_resolution_controller:resolve'
   requirements:

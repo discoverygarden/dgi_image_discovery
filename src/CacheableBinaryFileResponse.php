@@ -40,11 +40,9 @@ class CacheableBinaryFileResponse extends BinaryFileResponse implements Cacheabl
    * {@inheritDoc}
    */
   public function __sleep() {
-    $vars = $this->traitSleep();
-
-    unset($vars['file']);
-
-    return $vars;
+    return array_diff($this->traitSleep(), [
+      'file',
+    ]);
   }
 
   /**

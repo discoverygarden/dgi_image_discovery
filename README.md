@@ -33,6 +33,8 @@ Search API can be made to index URLs to the discovered image in multiple ways:
 - `deferred`: Create URL to dedicated endpoint which can handle the final image lookup. Given responses here can be aware of Drupal's cache tag invalidations, we can accordingly change what is ultimately served.
 - `pre_generated`: Creates URL to styled image directly. May cause stale references to stick in the index, due to changing access control constraints.
 
+This is configurable on the field when it is added to be indexed. Effectively this defaults to `pre_generated` to maintain existing/current behaviour; however, `deferred` should possibly be preferred without other mechanisms to perform bulk reindexing due to changes on other entities. In particular, should there be something such as [Embargo](https://github.com/discoverygarden/embargo) and [Embargo Inheritance](https://github.com/discoverygarden/embargo_inheritance), where an access control statement applied to a parent node is expected to be applied to children. That said, `pre_generated` could be more convenient/efficient when there are no complex access control requirements in play.
+
 #### Deferral mechanism
 
 There are multiple plugins to dereference deferred URLs:

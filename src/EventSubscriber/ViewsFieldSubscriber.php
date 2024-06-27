@@ -2,9 +2,8 @@
 
 namespace Drupal\dgi_image_discovery\EventSubscriber;
 
-use Drupal\search_api\Event\SearchApiEvents;
 use Drupal\search_api\Event\MappingViewsFieldHandlersEvent;
-
+use Drupal\search_api\Event\SearchApiEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 /**

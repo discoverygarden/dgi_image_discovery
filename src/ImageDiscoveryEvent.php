@@ -2,12 +2,10 @@
 
 namespace Drupal\dgi_image_discovery;
 
-use Drupal\media\MediaInterface;
-
 use Drupal\Core\Cache\RefinableCacheableDependencyInterface;
 use Drupal\Core\Cache\RefinableCacheableDependencyTrait;
 use Drupal\Core\Entity\ContentEntityInterface;
-
+use Drupal\media\MediaInterface;
 use Symfony\Contracts\EventDispatcher\Event;
 
 /**

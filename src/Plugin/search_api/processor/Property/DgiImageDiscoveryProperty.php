@@ -20,6 +20,7 @@ class DgiImageDiscoveryProperty extends ConfigurablePropertyBase {
   public function defaultConfiguration() {
     return [
       'image_style' => 'solr_grid_thumbnail',
+      'url_generator' => 'pre_generated',
     ];
   }
 
@@ -35,6 +36,12 @@ class DgiImageDiscoveryProperty extends ConfigurablePropertyBase {
       '#title' => $this->t('Image Style'),
       '#description' => $this->t('Select the image style that should be applied to derive the DGI Image Discovery image url.'),
       '#default_value' => $configuration['image_style'],
+    ];
+    $form['url_generator'] = [
+      '#type' => 'select',
+      '#options' => $this->definition['dgi_image_discovery__url_generator_options'],
+      '#title' => $this->t('URL Generator'),
+      '#default_value' => $configuration['url_generator'],
     ];
 
     return $form;

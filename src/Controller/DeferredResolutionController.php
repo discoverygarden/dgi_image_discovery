@@ -2,8 +2,10 @@
 
 namespace Drupal\dgi_image_discovery\Controller;
 
+use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
+use Drupal\Core\Http\Exception\CacheableHttpException;
 use Drupal\Core\Render\RenderContext;
 use Drupal\Core\Render\RendererInterface;
 use Drupal\dgi_image_discovery\DeferredResolutionPluginManagerInterface;
@@ -55,7 +57,13 @@ class DeferredResolutionController implements ContainerInjectionInterface {
       /** @var \Drupal\dgi_image_discovery\DeferredResolutionInterface $plugin */
       $plugin = $this->deferredResolutionPluginManager->createInstance(getenv('DGI_IMAGE_DISCOVERY_DEFERRED_PLUGIN') ?: 'subrequest');
 
-      return $plugin->resolve($node, $style);
+      try {
+        return $plugin->resolve($node, $style);
+      }
+      catch (CacheableHttpException $e) {
+        return (new CacheableResponse($e->getMessage(), $e->getStatusCode()))
+          ->addCacheableDependency($e);
+      }
     });
 
     if (!$context->isEmpty()) {

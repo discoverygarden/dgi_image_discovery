@@ -4,7 +4,7 @@ namespace Drupal\dgi_image_discovery\Plugin\dgi_image_discovery\url_generator;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\GeneratedUrl;
-use Drupal\Core\Http\Exception\CacheableHttpException;
+use Drupal\Core\Http\Exception\CacheableNotFoundHttpException;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\image\ImageStyleInterface;
 use Drupal\node\NodeInterface;
@@ -43,6 +43,7 @@ trait UrlGenerationTrait {
    *
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\Http\Exception\CacheableNotFoundHttpException
    */
   public function getGeneratedUrl(NodeInterface $node, ImageStyleInterface $style) : GeneratedUrl {
     $generated_url = (new GeneratedUrl())
@@ -53,7 +54,7 @@ trait UrlGenerationTrait {
     $generated_url->addCacheableDependency($event);
     $media = $event->getMedia();
     if (empty($media)) {
-      throw new CacheableHttpException($generated_url, 404, "No media discovered for node ({$node->id()}).");
+      throw new CacheableNotFoundHttpException($generated_url, "No media discovered for node ({$node->id()}).");
     }
 
     $generated_url->addCacheableDependency($media);
@@ -63,7 +64,7 @@ trait UrlGenerationTrait {
     /** @var \Drupal\file\FileInterface|null $image */
     $image = $this->getEntityTypeManager()->getStorage('file')->load($file_id);
     if (empty($image)) {
-      throw new CacheableHttpException($generated_url, 404, "File ID ({$file_id}) discovered for node ({$node->id()}) could not be loaded.");
+      throw new CacheableNotFoundHttpException($generated_url, "File ID ({$file_id}) discovered for node ({$node->id()}) could not be loaded.");
     }
 
     $generated_url->addCacheableDependency($image);

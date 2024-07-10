@@ -14,6 +14,7 @@ use Drupal\dgi_image_discovery\UrlGeneratorPluginBase;
 use Drupal\image\ImageStyleInterface;
 use Drupal\node\NodeInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * Plugin implementation for pre-generated URLs.
@@ -44,8 +45,13 @@ class PreGenerated extends UrlGeneratorPluginBase implements ContainerFactoryPlu
   /**
    * {@inheritDoc}
    */
-  public function generate(NodeInterface $node, ImageStyleInterface $style): GeneratedUrl {
-    return $this->getGeneratedUrl($node, $style);
+  public function generate(NodeInterface $node, ImageStyleInterface $style): ?GeneratedUrl {
+    try {
+      return $this->getGeneratedUrl($node, $style);
+    }
+    catch (NotFoundHttpException) {
+      return NULL;
+    }
   }
 
   /**

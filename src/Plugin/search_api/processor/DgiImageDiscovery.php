@@ -6,6 +6,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\dgi_image_discovery\Plugin\search_api\processor\Property\DgiImageDiscoveryProperty;
+use Drupal\dgi_image_discovery\UrlGeneratorPluginManagerInterface;
 use Drupal\node\NodeInterface;
 use Drupal\search_api\Datasource\DatasourceInterface;
 use Drupal\search_api\Item\ItemInterface;
@@ -50,7 +51,8 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     $plugin_id,
     $plugin_definition,
     ImageDiscoveryInterface $image_discovery,
-    EntityTypeManagerInterface $entity_type_manager
+    EntityTypeManagerInterface $entity_type_manager,
+    protected UrlGeneratorPluginManagerInterface $urlGeneratorPluginManager,
   ) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
 
@@ -67,7 +69,8 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
       $plugin_id,
       $plugin_definition,
       $container->get('dgi_image_discovery.service'),
-      $container->get('entity_type.manager')
+      $container->get('entity_type.manager'),
+      $container->get('plugin.manager.dgi_image_discovery.url_generator'),
     );
   }
 
@@ -84,6 +87,7 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
         'type' => 'string',
         'is_list' => FALSE,
         'processor_id' => $this->getPluginId(),
+        'dgi_image_discovery__url_generator_options' => $this->getGeneratorOptions(),
       ];
       $properties['dgi_image_discovery'] = new DgiImageDiscoveryProperty($definition);
     }
@@ -92,35 +96,41 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
   }
 
   /**
+   * Helper; get listing of generators for use as form options.
+   *
+   * @return string[]
+   *   An array mapping plugin IDs to human-readable strings.
+   */
+  protected function getGeneratorOptions() : array {
+    $options = [];
+
+    foreach ($this->urlGeneratorPluginManager->getDefinitions() as $plugin_id => $definition) {
+      $options[$plugin_id] = $definition['label'];
+    }
+
+    return $options;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function addFieldValues(ItemInterface $item) {
     $entity = $item->getOriginalObject()->getValue();
-    $value = NULL;
 
     // Get the image discovery URL.
     if (!$entity->isNew() && $entity instanceof NodeInterface) {
-      $event = $this->imageDiscovery->getImage($entity);
-      $media = $event->getMedia();
-      if (empty($media)) {
-        return;
-      }
-
-      $media_source = $media->getSource();
-      $file_id = $media_source->getSourceFieldValue($media);
-      $image = $this->entityTypeManager->getStorage('file')->load($file_id);
-      if (empty($image)) {
-        return;
-      }
-
       $fields = $item->getFields(FALSE);
       $fields = $this->getFieldsHelper()->filterForPropertyPath($fields, NULL, 'dgi_image_discovery');
       foreach ($fields as $field) {
         $config = $field->getConfiguration();
-        $image_style = $config['image_style'];
-        $value = $this->entityTypeManager->getStorage('image_style')->load($image_style)
-          ->buildUrl($image->getFileUri());
-        $field->addValue($value);
+        /** @var \Drupal\image\ImageStyleInterface $image_style */
+        $image_style = $this->entityTypeManager->getStorage('image_style')->load($config['image_style']);
+        /** @var \Drupal\dgi_image_discovery\UrlGeneratorInterface $url_generator */
+        $url_generator = $this->urlGeneratorPluginManager->createInstance($config['url_generator'] ?? 'pre_generated');
+        $generated_url = $url_generator->generate($entity, $image_style);
+        if ($generated_url) {
+          $field->addValue($generated_url->getGeneratedUrl());
+        }
       }
     }
   }

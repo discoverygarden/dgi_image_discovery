@@ -25,3 +25,14 @@ services:
     class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverRepresentativeImageSubscriber'
     tags:
       - name: event_subscriber
+  dgi_image_discovery.deferred_resolution_controller:
+    class: '\Drupal\dgi_image_discovery\Controller\DeferredResolutionController'
+    factory: [null, 'create']
+    arguments:
+      - '@service_container'
+  plugin.manager.dgi_image_discovery.url_generator:
+    class: Drupal\dgi_image_discovery\UrlGeneratorPluginManager
+    parent: default_plugin_manager
+  plugin.manager.dgi_image_discovery.url_generator.deferred:
+    class: Drupal\dgi_image_discovery\DeferredResolutionPluginManager
+    parent: default_plugin_manager

@@ -12,19 +12,12 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class ImageDiscovery implements ImageDiscoveryInterface {
 
   /**
-   * The event dispatcher service.
-   *
-   * @var \Symfony\Contracts\EventDispatcher\EventDispatcherInterface
-   */
-  protected EventDispatcherInterface $eventDispatcher;
-
-  /**
    * Constructor.
    */
   public function __construct(
-    EventDispatcherInterface $event_dispatcher
+    protected EventDispatcherInterface $eventDispatcher,
   ) {
-    $this->eventDispatcher = $event_dispatcher;
+    // No-op, other than setting property.
   }
 
   /**

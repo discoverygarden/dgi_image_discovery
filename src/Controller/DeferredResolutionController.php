@@ -2,6 +2,7 @@
 
 namespace Drupal\dgi_image_discovery\Controller;
 
+use Drupal\Core\Cache\CacheableMetadata;
 use Drupal\Core\Cache\CacheableResponse;
 use Drupal\Core\Cache\CacheableResponseInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
@@ -71,7 +72,11 @@ class DeferredResolutionController implements ContainerInjectionInterface {
       $response->addCacheableDependency($metadata);
     }
 
-    return $response;
+    // Add some additional contexts representing this particular request.
+    $cache_meta = (new CacheableMetadata())
+      ->addCacheContexts(['route', 'url.path']);
+
+    return $response->addCacheableDependency($cache_meta);
 
   }
 

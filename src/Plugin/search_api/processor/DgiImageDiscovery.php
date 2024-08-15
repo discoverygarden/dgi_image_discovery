@@ -7,10 +7,13 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\dgi_image_discovery\Plugin\search_api\processor\Property\DgiImageDiscoveryProperty;
 use Drupal\dgi_image_discovery\UrlGeneratorPluginManagerInterface;
+use Drupal\file\Entity\File;
+use Drupal\media\Entity\Media;
 use Drupal\node\NodeInterface;
 use Drupal\search_api\Datasource\DatasourceInterface;
 use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Processor\ProcessorPluginBase;
+use Drupal\taxonomy\Entity\Term;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -158,13 +161,13 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     $model_terms = $node->get('field_model')->referencedEntities();
 
     foreach ($model_terms as $term) {
-      if ($term instanceof \Drupal\taxonomy\Entity\Term) {
+      if ($term instanceof Term) {
         // Load the media entity referenced by the field_defaultimage.
         $media = $term->get('field_defaultimage')->entity;
-        if ($media instanceof \Drupal\media\Entity\Media) {
+        if ($media instanceof Media) {
           // Load the file entity from the media entity.
           $file = $media->get('field_media_image')->entity;
-          if ($file instanceof \Drupal\file\Entity\File) {
+          if ($file instanceof File) {
             // Use the provided image style.
             $default_image_url = $this->entityTypeManager->getStorage('image_style')->load($image_style_name)
               ->buildUrl($file->getFileUri());

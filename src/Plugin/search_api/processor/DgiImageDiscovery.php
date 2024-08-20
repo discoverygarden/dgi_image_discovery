@@ -136,7 +136,7 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
         }
         else {
           // Fallback to default image if URL generation fails.
-          $default_image_url = $this->getDefaultImageFromTaxonomy($entity, $image_style_name);
+          $default_image_url = $this->getDefaultImageFromTaxonomy($entity, $image_style->getName());
           if ($default_image_url) {
             $field->addValue($default_image_url);
           }
@@ -162,8 +162,8 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
 
     foreach ($model_terms as $term) {
       if ($term instanceof Term) {
-        // Load the media entity referenced by the field_defaultimage.
-        $media = $term->get('field_defaultimage')->entity;
+        // Load the media entity referenced by the field_default_image.
+        $media = $term->get('field_default_image')->entity;
         if ($media instanceof Media) {
           // Load the file entity from the media entity.
           $file = $media->get('field_media_image')->entity;

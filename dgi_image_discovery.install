@@ -1,5 +1,8 @@
 <?php
 
+use Drupal\field\Entity\FieldStorageConfig;
+use Drupal\field\Entity\FieldConfig;
+
 /**
  * @file
  * Module installation hook implementations.
@@ -16,7 +19,7 @@ function dgi_image_discovery_update_8001() {
   // Check if the field storage exists.
   if (!\Drupal::service('entity_type.manager')->getStorage('field_storage_config')->load("$entity_type.$field_name")) {
     // Create field storage.
-    \Drupal\field\Entity\FieldStorageConfig::create([
+    FieldStorageConfig::create([
       'field_name' => $field_name,
       'entity_type' => $entity_type,
       'type' => 'image',
@@ -27,7 +30,7 @@ function dgi_image_discovery_update_8001() {
   // Check if the field exists.
   if (!\Drupal::service('entity_type.manager')->getStorage('field_config')->load("$entity_type.$vocabulary_name.$field_name")) {
     // Create field instance.
-    \Drupal\field\Entity\FieldConfig::create([
+    FieldConfig::create([
       'field_storage' => \Drupal::service('entity_type.manager')->getStorage('field_storage_config')->load("$entity_type.$field_name"),
       'bundle' => $vocabulary_name,
       'label' => 'Default Image',

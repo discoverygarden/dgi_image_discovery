@@ -63,6 +63,15 @@ To override the use of the "Islandora" thumbnail, you can add a new field to eac
 
 If you are adding the field to more than one content type, you should choose "Re-use an existing field" on subsequent content types.
 
+### Adding a "Default Image" Field to Your Content Type ###
+This module, through an update hook, will add a field_default_image field to the Islandora Models vocabulary.
+
+- Configuring a Default Image for a Content Type
+  - Create a media item of type Image to serve as the default image for the required content types.
+  - In the Islandora Models vocabulary, select the appropriate default image for each term.
+
+This setup allows the module to associate a default thumbnail (TN) with objects that lack a specific thumbnail for any given content type.
+
 ### Using the image in Views
 
 When configuring a content view, add and configure the virtual field

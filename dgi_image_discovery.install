@@ -1,0 +1,63 @@
+<?php
+
+/**
+ * @file
+ * Module installation hook implementations.
+ */
+
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
+
+/**
+ * Implements hook_update_N().
+ */
+function dgi_image_discovery_update_8001() {
+  $field_name = 'field_default_image';
+  $vocabulary_name = 'islandora_models';
+  $entity_type = 'taxonomy_term';
+
+  // Check if the field storage exists.
+  if (!\Drupal::service('entity_type.manager')->getStorage('field_storage_config')->load("$entity_type.$field_name")) {
+    // Create field storage.
+    FieldStorageConfig::create([
+      'field_name' => $field_name,
+      'entity_type' => $entity_type,
+      'type' => 'image',
+      'settings' => [],
+    ])->save();
+  }
+
+  // Check if the field exists.
+  if (!\Drupal::service('entity_type.manager')->getStorage('field_config')->load("$entity_type.$vocabulary_name.$field_name")) {
+    // Create field instance.
+    FieldConfig::create([
+      'field_storage' => \Drupal::service('entity_type.manager')->getStorage('field_storage_config')->load("$entity_type.$field_name"),
+      'bundle' => $vocabulary_name,
+      'label' => 'Default Image',
+      'settings' => [],
+    ])->save();
+  }
+
+  // Add the field to the default form display.
+  $form_display = \Drupal::service('entity_type.manager')->getStorage('entity_form_display')->load("$entity_type.$vocabulary_name.default");
+  if ($form_display) {
+    $form_display->setComponent($field_name, [
+      'type' => 'image_image',
+      'weight' => 5,
+    ])->save();
+  }
+
+  // Add the field to the default view display.
+  $view_display = \Drupal::service('entity_type.manager')->getStorage('entity_view_display')->load("$entity_type.$vocabulary_name.default");
+  if ($view_display) {
+    $view_display->setComponent($field_name, [
+      'label' => 'above',
+      'type' => 'image',
+      'weight' => 5,
+      'settings' => [
+        'image_style' => 'thumbnail',
+        'image_link' => 'content',
+      ],
+    ])->save();
+  }
+}

@@ -7,10 +7,13 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\dgi_image_discovery\Plugin\search_api\processor\Property\DgiImageDiscoveryProperty;
 use Drupal\dgi_image_discovery\UrlGeneratorPluginManagerInterface;
+use Drupal\file\Entity\File;
+use Drupal\media\Entity\Media;
 use Drupal\node\NodeInterface;
 use Drupal\search_api\Datasource\DatasourceInterface;
 use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Processor\ProcessorPluginBase;
+use Drupal\taxonomy\Entity\Term;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -131,8 +134,51 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
         if ($generated_url) {
           $field->addValue($generated_url->getGeneratedUrl());
         }
+        else {
+          // Fallback to default image if URL generation fails.
+          $default_image_url = $this->getDefaultImageFromTaxonomy($entity, $image_style->getName());
+          if ($default_image_url) {
+            $field->addValue($default_image_url);
+          }
+        }
       }
     }
+  }
+
+  /**
+   * Gets the default image URL from the taxonomy term.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The node to get the default image from.
+   * @param string $image_style_name
+   *   The image style to use.
+   *
+   * @return string|null
+   *   The default image URL or null if not found.
+   */
+  protected function getDefaultImageFromTaxonomy(NodeInterface $node, string $image_style_name) {
+    $default_image_url = NULL;
+    $model_terms = $node->get('field_model')->referencedEntities();
+
+    foreach ($model_terms as $term) {
+      if ($term instanceof Term) {
+        // Load the media entity referenced by the field_default_image.
+        $media = $term->get('field_default_image')->entity;
+        if ($media instanceof Media) {
+          // Load the file entity from the media entity.
+          $file = $media->get('field_media_image')->entity;
+          if ($file instanceof File) {
+            // Use the provided image style.
+            $default_image_url = $this->entityTypeManager->getStorage('image_style')->load($image_style_name)
+              ->buildUrl($file->getFileUri());
+            // Return the first default image found, if applicable.
+            break;
+          }
+        }
+      }
+    }
+
+    return $default_image_url;
   }
 
 }

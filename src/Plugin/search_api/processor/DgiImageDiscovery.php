@@ -158,6 +158,11 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
    */
   protected function getDefaultImageFromTaxonomy(NodeInterface $node, string $image_style_name) {
     $default_image_url = NULL;
+
+    if (!$node->hasField('field_model')) {
+      return NULL;
+    }
+
     $model_terms = $node->get('field_model')->referencedEntities();
 
     foreach ($model_terms as $term) {

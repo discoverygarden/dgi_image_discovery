@@ -7,14 +7,10 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
 use Drupal\dgi_image_discovery\Plugin\search_api\processor\Property\DgiImageDiscoveryProperty;
 use Drupal\dgi_image_discovery\UrlGeneratorPluginManagerInterface;
-use Drupal\file\Entity\File;
-use Drupal\image\ImageStyleInterface;
-use Drupal\media\Entity\Media;
 use Drupal\node\NodeInterface;
 use Drupal\search_api\Datasource\DatasourceInterface;
 use Drupal\search_api\Item\ItemInterface;
 use Drupal\search_api\Processor\ProcessorPluginBase;
-use Drupal\taxonomy\Entity\Term;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**

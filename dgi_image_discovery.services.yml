@@ -25,6 +25,10 @@ services:
     class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverRepresentativeImageSubscriber'
     tags:
       - name: event_subscriber
+  dgi_image_discovery.model_fallback_subscriber:
+    class: '\Drupal\dgi_image_discovery\EventSubscriber\ModelDefaultFallbackSubscriber'
+    tags:
+      - name: event_subscriber
   dgi_image_discovery.deferred_resolution_controller:
     class: '\Drupal\dgi_image_discovery\Controller\DeferredResolutionController'
     factory: [null, 'create']

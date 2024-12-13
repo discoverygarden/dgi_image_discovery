@@ -161,13 +161,18 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     if (!$node->hasField('field_model')) {
       return NULL;
     }
-
     $model_terms = $node->get('field_model')->referencedEntities();
 
     foreach ($model_terms as $term) {
       if ($term instanceof Term) {
         // Load the media entity referenced by the field_default_image.
         $media = $term->get('field_default_image')->entity;
+
+        // Default content loaded from term returns file, so this use case
+        // adds support for islandora models with configured default thumbnails.
+        if ($media instanceof File) {
+          return $image_style->buildUrl($media->getFileUri());
+        }
         if ($media instanceof Media) {
           // Load the file entity from the media entity.
           $file = $media->get('field_media_image')->entity;

@@ -161,6 +161,7 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
     if (!$node->hasField('field_model')) {
       return NULL;
     }
+
     $model_terms = $node->get('field_model')->referencedEntities();
 
     foreach ($model_terms as $term) {

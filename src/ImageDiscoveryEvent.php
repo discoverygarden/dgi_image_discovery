@@ -64,6 +64,8 @@ class ImageDiscoveryEvent extends Event implements RefinableCacheableDependencyI
    * Entity setter.
    */
   public function setMedia(MediaInterface $media) : ImageDiscoveryEvent {
+    dsm("x");
+    dsm($media);
     $this->media = $media;
     $this->addCacheableDependency($media);
     return $this;

@@ -77,7 +77,7 @@ class DgiImageDiscovery extends ProcessorPluginBase implements ContainerFactoryP
   /**
    * {@inheritdoc}
    */
-  public function getPropertyDefinitions(DatasourceInterface $datasource = NULL) {
+  public function getPropertyDefinitions(?DatasourceInterface $datasource = NULL) {
     $properties = [];
 
     if (!$datasource) {

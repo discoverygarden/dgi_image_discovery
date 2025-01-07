@@ -45,7 +45,7 @@ class DIDImageItem extends EntityReferenceItem implements RefinableCacheableDepe
   public function __construct(
     DataDefinitionInterface $definition,
     $name = NULL,
-    TypedDataInterface $parent = NULL,
+    ?TypedDataInterface $parent = NULL,
   ) {
     parent::__construct($definition, $name, $parent);
 

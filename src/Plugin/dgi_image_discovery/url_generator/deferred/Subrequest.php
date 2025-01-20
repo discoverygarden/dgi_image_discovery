@@ -63,6 +63,9 @@ class Subrequest extends DeferredResolutionPluginBase {
           ->setAutoLastModified()
           ->addCacheableDependency($generated_url);
       }
+      elseif ($response instanceof CacheableResponseInterface && ((int) ($response->getStatusCode() / 100)) === 3) {
+        return $response;
+      }
       elseif ($response->getStatusCode() === 503) {
         $after = $response->headers->get('Retry-After');
         if ($after === NULL) {
@@ -79,6 +82,7 @@ class Subrequest extends DeferredResolutionPluginBase {
           continue;
         }
       }
+
       throw $this->getExceptionFromResponse($response, $generated_url);
     }
 

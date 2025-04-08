@@ -54,7 +54,14 @@ class Subrequest extends DeferredResolutionPluginBase {
     $attempts = 3;
     while ($attempts-- > 0) {
       $current_request = $this->requestStack->getCurrentRequest();
-      $request = Request::create($generated_url->getGeneratedUrl());
+      if (!$current_request) {
+        throw new \LogicException('Unknown request.');
+      }
+      $request = Request::create(
+        $generated_url->getGeneratedUrl(),
+        cookies: $current_request->cookies->all(),
+        server: $current_request->server->all(),
+      );
       $request->setSession($current_request->getSession());
       $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
       if ($response instanceof BinaryFileResponse) {

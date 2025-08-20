@@ -61,6 +61,9 @@ trait UrlGenerationTrait {
 
     $media_source = $media->getSource();
     $file_id = $media_source->getSourceFieldValue($media);
+    if (empty($file_id)) {
+      throw new CacheableNotFoundHttpException($generated_url, "No file ID for discovered media ({$media->id()}) for node ({$node->id()}).");
+    }
     /** @var \Drupal\file\FileInterface|null $image */
     $image = $this->getEntityTypeManager()->getStorage('file')->load($file_id);
     if (empty($image)) {

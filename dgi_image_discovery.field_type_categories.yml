@@ -1,0 +1,4 @@
+dgi_image_discovery:
+  label: "DGI Image Discovery"
+  description: "An image relevant to the given node."
+  weight: 100

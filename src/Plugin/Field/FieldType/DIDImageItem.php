@@ -19,6 +19,7 @@ use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
  *   default_formatter = "media_thumbnail",
  *   constraints = {"ReferenceAccess" = {}},
  *   list_class = "\Drupal\dgi_image_discovery\DIDImageItemList",
+ *   no_ui = TRUE,
  * )
  */
 class DIDImageItem extends EntityReferenceItem implements RefinableCacheableDependencyInterface {

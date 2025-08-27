@@ -18,6 +18,7 @@ use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
  *   description = @Translation("An image relevant to the given node."),
  *   default_formatter = "media_thumbnail",
  *   constraints = {"ReferenceAccess" = {}},
+ *   category = "dgi_image_discovery",
  *   list_class = "\Drupal\dgi_image_discovery\DIDImageItemList",
  * )
  */

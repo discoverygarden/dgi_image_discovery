@@ -20,6 +20,7 @@ use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
  *   constraints = {"ReferenceAccess" = {}},
  *   category = "dgi_image_discovery",
  *   list_class = "\Drupal\dgi_image_discovery\DIDImageItemList",
+ *   no_ui = TRUE,
  * )
  */
 class DIDImageItem extends EntityReferenceItem implements RefinableCacheableDependencyInterface {

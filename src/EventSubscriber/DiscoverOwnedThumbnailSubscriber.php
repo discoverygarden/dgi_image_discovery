@@ -22,12 +22,23 @@ class DiscoverOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
   protected EntityStorageInterface $mediaStorage;
 
   /**
+   * Flag to allow falling back to original file if thumbnail is absent.
+   *
+   * @var bool
+   */
+  protected bool $fallbackToOriginalFile = FALSE;
+
+  /**
    * Constructor.
    */
   public function __construct(
     EntityTypeManagerInterface $entity_type_manager,
   ) {
     $this->mediaStorage = $entity_type_manager->getStorage('media');
+    $this->fallbackToOriginalFile = filter_var(
+      getenv('DGI_IMAGE_DISCOVERY__FALLBACK_TO_ORIGINAL_FILE') ?: 'false',
+      FILTER_VALIDATE_BOOLEAN,
+    );
   }
 
   /**
@@ -49,7 +60,7 @@ class DiscoverOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
 
     // If there is no thumbnail, see if there is an Original File Image Media
     // entity to style as a thumbnail instead.
-    if (empty($results)) {
+    if (empty($results) && $this->fallbackToOriginalFile) {
       $results = $this->mediaStorage->getQuery()
         ->condition('field_media_of', $node->id())
         ->condition('bundle', 'image')

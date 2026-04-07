@@ -82,6 +82,13 @@ When configuring a content view, add and configure the virtual field
 Under "Manage display" for a content type, you can enable the pseudo-field
 "DGI Image Discovery Discovered Image".
 
+### Environment Variables
+
+| Name | Default | Description |
+| --- | --- | --- |
+| `DGI_IMAGE_DISCOVERY__FALLBACK_TO_ORIGINAL_FILE` | `"false"` | Boolean toggle to allow the use of "original file" media should a "thumbnail" be absent. |
+| `DGI_IMAGE_DISCOVERY_DEFERRED_PLUGIN` | `"subrequest"` | See [Deferral mechanism](#deferral-mechanism) docs. |
+
 ## Troubleshooting/Issues
 
 Having problems or solved a problem? Contact

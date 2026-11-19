@@ -65,10 +65,13 @@ class Subrequest extends DeferredResolutionPluginBase {
       $request->setSession($current_request->getSession());
       $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
       if ($response instanceof BinaryFileResponse) {
-        return CacheableBinaryFileResponse::convert($response)
-          ->setAutoEtag()
-          ->setAutoLastModified()
+        $to_return = CacheableBinaryFileResponse::convert($response)
           ->addCacheableDependency($generated_url);
+        if (filter_input(INPUT_ENV, 'DGI_IMAGE_DISCOVERY_DEFERRED_SUBREQUEST_AUTO_CACHE_HEADERS', FILTER_VALIDATE_BOOLEAN) ?: TRUE) {
+          $to_return->setAutoEtag()
+            ->setAutoLastModified();
+        }
+        return $to_return;
       }
       elseif ($response instanceof CacheableResponseInterface && ((int) ($response->getStatusCode() / 100)) === 3) {
         return $response;

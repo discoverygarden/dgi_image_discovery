@@ -80,16 +80,18 @@ class Subrequest extends DeferredResolutionPluginBase {
         }
         return $to_return;
       }
-      elseif ($response instanceof CacheableResponseInterface && ((int) ($response->getStatusCode() / 100)) === 3) {
+
+      if ($response instanceof CacheableResponseInterface && ((int) ($response->getStatusCode() / 100)) === 3) {
         return $response;
       }
-      elseif ($response->getStatusCode() === 503) {
+
+      if ($response->getStatusCode() === 503) {
         $after = $response->headers->get('Retry-After');
         if ($after === NULL) {
           // No value.
           throw $this->getExceptionFromResponse($response, $generated_url);
         }
-        $after = intval($after);
+        $after = (int) $after;
         if ($after > 0 && $after <= 5) {
           // If we have a requested time for which we are willing to wait, let's
           // wait it out. Image derivation indicates 3 seconds, but let's allow

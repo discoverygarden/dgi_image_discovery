@@ -74,7 +74,7 @@ class Subrequest extends DeferredResolutionPluginBase {
       if ($response instanceof BinaryFileResponse) {
         $to_return = CacheableBinaryFileResponse::convert($response)
           ->addCacheableDependency($generated_url);
-        if ($this->getAutoHeaders()) {
+        if ($this->autoCacheHeaders) {
           $to_return->setAutoEtag()
             ->setAutoLastModified();
         }
@@ -134,7 +134,8 @@ class Subrequest extends DeferredResolutionPluginBase {
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
     return parent::create($container, $configuration, $plugin_id, $plugin_definition)
       ->setHttpKernel($container->get('http_kernel'))
-      ->setRequestStack($container->get('request_stack'));
+      ->setRequestStack($container->get('request_stack'))
+      ->setAutoHeaders($container->getParameter('dgi_image_discovery.deferred.subrequest.auto_cache_headers'));
   }
 
   /**
@@ -166,13 +167,17 @@ class Subrequest extends DeferredResolutionPluginBase {
   }
 
   /**
-   * Lazily calculate auto headers setting.
+   * Setter; set flag to control auto header generation.
    *
-   * @return bool
-   *   TRUE if auto cache headers should be calculated; otherwise, FALSE.
+   * @param bool $flag
+   *   TRUE to generate etag/last-modified in PHP; otherwise, FALSE.
+   *
+   * @return $this
+   *   Fluent API.
    */
-  protected function getAutoHeaders() : bool {
-    return $this->autoCacheHeaders ??= (bool)(filter_input(INPUT_ENV, 'DGI_IMAGE_DISCOVERY_DEFERRED_SUBREQUEST_AUTO_CACHE_HEADERS', FILTER_VALIDATE_BOOLEAN) ?: TRUE);
+  public function setAutoHeaders(bool $flag) : static {
+    $this->autoCacheHeaders = $flag;
+    return $this;
   }
 
 }

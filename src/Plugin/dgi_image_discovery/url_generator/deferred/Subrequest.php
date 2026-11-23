@@ -45,6 +45,13 @@ class Subrequest extends DeferredResolutionPluginBase {
   protected RequestStack $requestStack;
 
   /**
+   * Flag; if we should generate cache headers within PHP, automatically.
+   *
+   * @var bool
+   */
+  protected bool $autoCacheHeaders;
+
+  /**
    * {@inheritDoc}
    */
   public function resolve(NodeInterface $node, ImageStyleInterface $style): CacheableResponseInterface {
@@ -67,7 +74,7 @@ class Subrequest extends DeferredResolutionPluginBase {
       if ($response instanceof BinaryFileResponse) {
         $to_return = CacheableBinaryFileResponse::convert($response)
           ->addCacheableDependency($generated_url);
-        if (filter_input(INPUT_ENV, 'DGI_IMAGE_DISCOVERY_DEFERRED_SUBREQUEST_AUTO_CACHE_HEADERS', FILTER_VALIDATE_BOOLEAN) ?: TRUE) {
+        if ($this->autoCacheHeaders) {
           $to_return->setAutoEtag()
             ->setAutoLastModified();
         }
@@ -125,12 +132,52 @@ class Subrequest extends DeferredResolutionPluginBase {
    * {@inheritDoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    return parent::create($container, $configuration, $plugin_id, $plugin_definition)
+      ->setHttpKernel($container->get('http_kernel'))
+      ->setRequestStack($container->get('request_stack'))
+      ->setAutoHeaders(filter_input(INPUT_ENV, 'DGI_IMAGE_DISCOVERY_DEFERRED_SUBREQUEST_AUTO_CACHE_HEADERS', FILTER_VALIDATE_BOOLEAN) ?: TRUE);
+  }
 
-    $instance->httpKernel = $container->get('http_kernel');
-    $instance->requestStack = $container->get('request_stack');
+  /**
+   * Setter; set the HTTP kernel.
+   *
+   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+   *   The HTTP kernel to set.
+   *
+   * @return $this
+   *   Fluent API.
+   */
+  public function setHttpKernel(HttpKernelInterface $httpKernel) : static {
+    $this->httpKernel = $httpKernel;
+    return $this;
+  }
 
-    return $instance;
+  /**
+   * Setter; set the request stack.
+   *
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack to set.
+   *
+   * @return $this
+   *   Fluent API.
+   */
+  public function setRequestStack(RequestStack $requestStack) : static {
+    $this->requestStack = $requestStack;
+    return $this;
+  }
+
+  /**
+   * Setter; set flag to control auto header generation.
+   *
+   * @param bool $flag
+   *   TRUE to generate etag/last-modified in PHP; otherwise, FALSE.
+   *
+   * @return $this
+   *   Fluent API.
+   */
+  public function setAutoHeaders(bool $flag) : static {
+    $this->autoCacheHeaders = $flag;
+    return $this;
   }
 
 }

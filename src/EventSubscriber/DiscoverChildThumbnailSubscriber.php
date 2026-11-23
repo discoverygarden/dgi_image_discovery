@@ -2,7 +2,6 @@
 
 namespace Drupal\dgi_image_discovery\EventSubscriber;
 
-use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\dgi_image_discovery\ImageDiscoveryEvent;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
@@ -26,28 +25,12 @@ class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
   protected int $depth;
 
   /**
-   * The node storage service of which to query/load nodes.
-   *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
-   */
-  protected EntityStorageInterface $nodeStorage;
-
-  /**
-   * The image discovery service.
-   *
-   * @var \Drupal\dgi_image_discovery\ImageDiscoveryInterface
-   */
-  protected ImageDiscoveryInterface $imageDiscovery;
-
-  /**
    * Constructor.
    */
   public function __construct(
-    ImageDiscoveryInterface $image_discovery,
-    EntityTypeManagerInterface $entity_type_manager,
+    protected ImageDiscoveryInterface $imageDiscovery,
+    protected EntityTypeManagerInterface $entityTypeManager,
   ) {
-    $this->imageDiscovery = $image_discovery;
-    $this->nodeStorage = $entity_type_manager->getStorage('node');
     $this->depth = 0;
   }
 
@@ -60,7 +43,7 @@ class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
     if (!($node instanceof NodeInterface)) {
       return;
     }
-    elseif ($this->depth + 1 > 3) {
+    if ($this->depth + 1 > 3) {
       // Exhausted depth.
       return;
     }
@@ -68,7 +51,9 @@ class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
     try {
       $this->depth += 1;
 
-      $results = $this->nodeStorage->getQuery()
+      $node_storage = $this->entityTypeManager->getStorage('node');
+
+      $results = $node_storage->getQuery()
         ->condition('field_member_of', $node->id())
         ->sort('field_weight')
         // XXX: field_weight is nullable or not unique, so break ties by sorting
@@ -81,7 +66,7 @@ class DiscoverChildThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
       $event->addCacheTags(['node_list']);
 
       if ($results) {
-        $child = $this->nodeStorage->load(reset($results));
+        $child = $node_storage->load(reset($results));
 
         $event->addCacheableDependency($child->access('view', NULL, TRUE));
 

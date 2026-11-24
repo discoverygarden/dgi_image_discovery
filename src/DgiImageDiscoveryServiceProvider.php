@@ -34,7 +34,8 @@ class DgiImageDiscoveryServiceProvider extends ServiceProviderBase {
    * @param string $name
    *   The name of the environment variable to parse.
    * @param bool $default
-   *   The default
+   *   The default value to use if the environment variable is not in the
+   *   environment.
    *
    * @return bool
    *   The parsed value if provided; otherwise, the provided default.

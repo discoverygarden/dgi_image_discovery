@@ -23,8 +23,9 @@ class DeferredResolutionController implements ContainerInjectionInterface {
    * Constructor.
    */
   public function __construct(
-    protected DeferredResolutionPluginManagerInterface $deferredResolutionPluginManager,
-    protected RendererInterface $renderer,
+    protected readonly DeferredResolutionPluginManagerInterface $deferredResolutionPluginManager,
+    protected readonly RendererInterface $renderer,
+    protected readonly string $pluginId,
   ) {}
 
   /**
@@ -34,6 +35,7 @@ class DeferredResolutionController implements ContainerInjectionInterface {
     return new static(
       $container->get('plugin.manager.dgi_image_discovery.url_generator.deferred'),
       $container->get('renderer'),
+      $container->getParameter('dgi_image_discovery.deferred.plugin'),
     );
   }
 
@@ -56,7 +58,7 @@ class DeferredResolutionController implements ContainerInjectionInterface {
     $response = $this->renderer->executeInRenderContext($context, function () use ($style, $node) {
       // @todo Make plugin configurable?
       /** @var \Drupal\dgi_image_discovery\DeferredResolutionInterface $plugin */
-      $plugin = $this->deferredResolutionPluginManager->createInstance(getenv('DGI_IMAGE_DISCOVERY_DEFERRED_PLUGIN') ?: 'subrequest');
+      $plugin = $this->deferredResolutionPluginManager->createInstance($this->pluginId);
 
       try {
         return $plugin->resolve($node, $style);

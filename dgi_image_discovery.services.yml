@@ -19,6 +19,7 @@ services:
     class: '\Drupal\dgi_image_discovery\EventSubscriber\DiscoverOwnedThumbnailSubscriber'
     arguments:
       - '@entity_type.manager'
+      - '%dgi_image_discovery.event_subscriber.owned_thumbnail.fallback_to_original_file%'
     tags:
       - name: event_subscriber
   dgi_image_discovery.discover_representative_subscriber:

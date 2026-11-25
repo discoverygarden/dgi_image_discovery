@@ -45,6 +45,16 @@ class Subrequest extends DeferredResolutionPluginBase {
   protected RequestStack $requestStack;
 
   /**
+   * Flag; if we should generate an etag cache headers within PHP.
+   *
+   * This involves hashing the file, so it is better to avoid if it will not
+   * be used.
+   *
+   * @var bool
+   */
+  protected bool $autoCacheEtag;
+
+  /**
    * {@inheritDoc}
    */
   public function resolve(NodeInterface $node, ImageStyleInterface $style): CacheableResponseInterface {
@@ -65,21 +75,26 @@ class Subrequest extends DeferredResolutionPluginBase {
       $request->setSession($current_request->getSession());
       $response = $this->httpKernel->handle($request, HttpKernelInterface::SUB_REQUEST);
       if ($response instanceof BinaryFileResponse) {
-        return CacheableBinaryFileResponse::convert($response)
-          ->setAutoEtag()
-          ->setAutoLastModified()
-          ->addCacheableDependency($generated_url);
+        $to_return = CacheableBinaryFileResponse::convert($response)
+          ->addCacheableDependency($generated_url)
+          ->setAutoLastModified();
+        if ($this->autoCacheEtag) {
+          $to_return->setAutoEtag();
+        }
+        return $to_return;
       }
-      elseif ($response instanceof CacheableResponseInterface && ((int) ($response->getStatusCode() / 100)) === 3) {
+
+      if ($response instanceof CacheableResponseInterface && ((int) ($response->getStatusCode() / 100)) === 3) {
         return $response;
       }
-      elseif ($response->getStatusCode() === 503) {
+
+      if ($response->getStatusCode() === 503) {
         $after = $response->headers->get('Retry-After');
         if ($after === NULL) {
           // No value.
           throw $this->getExceptionFromResponse($response, $generated_url);
         }
-        $after = intval($after);
+        $after = (int) $after;
         if ($after > 0 && $after <= 5) {
           // If we have a requested time for which we are willing to wait, let's
           // wait it out. Image derivation indicates 3 seconds, but let's allow
@@ -122,12 +137,52 @@ class Subrequest extends DeferredResolutionPluginBase {
    * {@inheritDoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition): static {
-    $instance = parent::create($container, $configuration, $plugin_id, $plugin_definition);
+    return parent::create($container, $configuration, $plugin_id, $plugin_definition)
+      ->setHttpKernel($container->get('http_kernel'))
+      ->setRequestStack($container->get('request_stack'))
+      ->setAutoHeaders($container->getParameter('dgi_image_discovery.deferred.subrequest.auto_cache_etag'));
+  }
 
-    $instance->httpKernel = $container->get('http_kernel');
-    $instance->requestStack = $container->get('request_stack');
+  /**
+   * Setter; set the HTTP kernel.
+   *
+   * @param \Symfony\Component\HttpKernel\HttpKernelInterface $httpKernel
+   *   The HTTP kernel to set.
+   *
+   * @return $this
+   *   Fluent API.
+   */
+  public function setHttpKernel(HttpKernelInterface $httpKernel) : static {
+    $this->httpKernel = $httpKernel;
+    return $this;
+  }
 
-    return $instance;
+  /**
+   * Setter; set the request stack.
+   *
+   * @param \Symfony\Component\HttpFoundation\RequestStack $requestStack
+   *   The request stack to set.
+   *
+   * @return $this
+   *   Fluent API.
+   */
+  public function setRequestStack(RequestStack $requestStack) : static {
+    $this->requestStack = $requestStack;
+    return $this;
+  }
+
+  /**
+   * Setter; set flag to control auto header generation.
+   *
+   * @param bool $flag
+   *   TRUE to generate etag/last-modified in PHP; otherwise, FALSE.
+   *
+   * @return $this
+   *   Fluent API.
+   */
+  public function setAutoHeaders(bool $flag) : static {
+    $this->autoCacheEtag = $flag;
+    return $this;
   }
 
 }

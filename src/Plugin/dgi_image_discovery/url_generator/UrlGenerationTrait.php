@@ -72,6 +72,13 @@ trait UrlGenerationTrait {
 
     $generated_url->addCacheableDependency($image);
 
+    // Ignore image style if we found a Thumbnail media derivative.
+    $thumbnail_uri = "http://pcdm.org/use#ThumbnailImage";
+    $media_use_uri = $media->field_media_use->entity->field_external_uri->uri;
+    if ($thumbnail_uri == $media_use_uri) {
+      return $generated_url->setGeneratedUrl($image->createFileUrl(FALSE));
+    }
+
     return $generated_url->setGeneratedUrl($style->buildUrl($image->getFileUri()));
   }
 

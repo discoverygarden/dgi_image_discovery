@@ -1,0 +1,9 @@
+---
+field.storage_settings.did_image:
+  type: field.storage_settings.entity_reference
+field.field_settings.did_image:
+  type: field.field_settings.entity_reference
+views.field.dgi_image:
+  type: views.field.field
+views.field.search_api_did_image:
+  type: views.field.search_api_field

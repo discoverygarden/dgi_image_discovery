@@ -92,6 +92,7 @@ trait UrlGenerationTrait {
    * Check if we should apply image styles when image is a Thumbnail.
    *
    * @return bool
+   *   Defaults to false if env var isn't set.
    */
   public function shouldStyleThumbnails() : bool {
     return (bool) filter_input(INPUT_ENV, 'DGI_IMAGE_DISCOVERY__SHOULD_STYLE_TN', FILTER_VALIDATE_BOOLEAN);

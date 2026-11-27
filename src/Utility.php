@@ -5,7 +5,7 @@ namespace Drupal\dgi_image_discovery;
 use Drupal\Islandora\IslandoraUtils;
 
 /**
- * Utility functions/values.
+ * Utility class with constants to avoid hardcoding things.
  */
 class Utility {
   const THUMBNAIL_URI = 'http://pcdm.org/use#ThumbnailImage';

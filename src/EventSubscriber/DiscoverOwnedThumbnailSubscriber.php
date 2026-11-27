@@ -4,6 +4,8 @@ namespace Drupal\dgi_image_discovery\EventSubscriber;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\dgi_image_discovery\ImageDiscoveryEvent;
+use Drupal\dgi_image_discovery\Utility;
+use Drupal\islandora\IslandoraUtils;
 use Drupal\node\NodeInterface;
 
 /**
@@ -34,8 +36,8 @@ class DiscoverOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
     $media_storage = $this->entityTypeManager->getStorage('media');
 
     $results = $media_storage->getQuery()
-      ->condition('field_media_of', $node->id())
-      ->condition('field_media_use.entity:taxonomy_term.field_external_uri.uri', 'http://pcdm.org/use#ThumbnailImage')
+      ->condition(IslandoraUtils::MEDIA_OF_FIELD, $node->id())
+      ->condition(Utility::MEDIA_USE_URI_FIELD, Utility::THUMBNAIL_URI)
       ->accessCheck()
       ->range(0, 1)
       ->execute();
@@ -44,9 +46,9 @@ class DiscoverOwnedThumbnailSubscriber extends AbstractImageDiscoverySubscriber 
     // entity to style as a thumbnail instead.
     if (empty($results) && $this->fallbackToOriginalFile) {
       $results = $media_storage->getQuery()
-        ->condition('field_media_of', $node->id())
+        ->condition(IslandoraUtils::MEDIA_OF_FIELD, $node->id())
         ->condition('bundle', 'image')
-        ->condition('field_media_use.entity:taxonomy_term.field_external_uri.uri', 'http://pcdm.org/use#OriginalFile')
+        ->condition(Utility::MEDIA_USE_URI_FIELD, Utility::ORIGINAL_FILE_URI)
         ->accessCheck()
         ->range(0, 1)
         ->execute();

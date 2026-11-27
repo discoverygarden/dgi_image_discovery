@@ -6,7 +6,9 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\GeneratedUrl;
 use Drupal\Core\Http\Exception\CacheableNotFoundHttpException;
 use Drupal\dgi_image_discovery\ImageDiscoveryInterface;
+use Drupal\dgi_image_discovery\Utility;
 use Drupal\image\ImageStyleInterface;
+use Drupal\Islandora\IslandoraUtils;
 use Drupal\node\NodeInterface;
 
 /**
@@ -73,9 +75,11 @@ trait UrlGenerationTrait {
     $generated_url->addCacheableDependency($image);
 
     // Ignore image style if we found a Thumbnail media derivative.
-    $thumbnail_uri = "http://pcdm.org/use#ThumbnailImage";
-    $media_use_uri = $media->field_media_use->entity->field_external_uri->uri;
-    if ($thumbnail_uri == $media_use_uri) {
+    $media_use_uri = $media
+      ->{IslandoraUtils::MEDIA_USAGE_FIELD}
+      ->entity->{IslandoraUtils::EXTERNAL_URI_FIELD}
+      ->uri;
+    if ($media_use_uri == Utility::THUMBNAIL_URI) {
       return $generated_url->setGeneratedUrl($image->createFileUrl(FALSE));
     }
 

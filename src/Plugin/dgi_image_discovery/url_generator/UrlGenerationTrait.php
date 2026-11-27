@@ -74,16 +74,27 @@ trait UrlGenerationTrait {
 
     $generated_url->addCacheableDependency($image);
 
-    // Ignore image style if we found a Thumbnail media derivative.
-    $media_use_uri = $media
-      ->{IslandoraUtils::MEDIA_USAGE_FIELD}
-      ->entity->{IslandoraUtils::EXTERNAL_URI_FIELD}
-      ->uri;
-    if ($media_use_uri == Utility::THUMBNAIL_URI) {
-      return $generated_url->setGeneratedUrl($image->createFileUrl(FALSE));
+    if (!$this->shouldStyleThumbnails()) {
+      // Ignore image style if we found a Thumbnail media derivative.
+      $media_use_uri = $media
+        ->{IslandoraUtils::MEDIA_USAGE_FIELD}
+        ->entity->{IslandoraUtils::EXTERNAL_URI_FIELD}
+        ->uri;
+      if ($media_use_uri == Utility::THUMBNAIL_URI) {
+        return $generated_url->setGeneratedUrl($image->createFileUrl(FALSE));
+      }
     }
 
     return $generated_url->setGeneratedUrl($style->buildUrl($image->getFileUri()));
+  }
+
+  /**
+   * Check if we should apply image styles when image is a Thumbnail.
+   *
+   * @return bool
+   */
+  public function shouldStyleThumbnails() : bool {
+    return (bool) filter_input(INPUT_ENV, 'DGI_IMAGE_DISCOVERY__SHOULD_STYLE_TN', FILTER_VALIDATE_BOOLEAN);
   }
 
 }

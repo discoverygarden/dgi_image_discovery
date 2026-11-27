@@ -89,7 +89,7 @@ Under "Manage display" for a content type, you can enable the pseudo-field
 | `DGI_IMAGE_DISCOVERY__FALLBACK_TO_ORIGINAL_FILE` | `"false"` | Boolean toggle to allow the use of "original file" media should a "thumbnail" be absent. |
 | `DGI_IMAGE_DISCOVERY_DEFERRED_PLUGIN` | `"subrequest"` | See [Deferral mechanism](#deferral-mechanism) docs. |
 | `DGI_IMAGE_DISCOVERY_DEFERRED_SUBREQUEST_AUTO_CACHE_ETAG` | `"true"` | If using the `subrequest` deferral mechanism, calculate ETag cache header by default; by specifying something false-y, this behavior can be disabled. |
-
+| `DGI_IMAGE_DISCOVERY__SHOULD_STYLE_TN` | `"false"` | Boolean toggle to allow applying the selected image style even if the discovered image is already a Thumbnail. |
 ## Troubleshooting/Issues
 
 Having problems or solved a problem? Contact
